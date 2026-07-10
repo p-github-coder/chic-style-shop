@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthenticatedShoesRouteImport } from './routes/_authenticated/shoes'
+import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AuthenticatedBagsRouteImport } from './routes/_authenticated/bags'
 
 const SignupRoute = SignupRouteImport.update({
@@ -40,6 +41,11 @@ const AuthenticatedShoesRoute = AuthenticatedShoesRouteImport.update({
   path: '/shoes',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedCartRoute = AuthenticatedCartRouteImport.update({
+  id: '/cart',
+  path: '/cart',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedBagsRoute = AuthenticatedBagsRouteImport.update({
   id: '/bags',
   path: '/bags',
@@ -51,6 +57,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/bags': typeof AuthenticatedBagsRoute
+  '/cart': typeof AuthenticatedCartRoute
   '/shoes': typeof AuthenticatedShoesRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/bags': typeof AuthenticatedBagsRoute
+  '/cart': typeof AuthenticatedCartRoute
   '/shoes': typeof AuthenticatedShoesRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,14 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
   '/_authenticated/bags': typeof AuthenticatedBagsRoute
+  '/_authenticated/cart': typeof AuthenticatedCartRoute
   '/_authenticated/shoes': typeof AuthenticatedShoesRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/signup' | '/bags' | '/shoes'
+  fullPaths: '/' | '/login' | '/signup' | '/bags' | '/cart' | '/shoes'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/signup' | '/bags' | '/shoes'
+  to: '/' | '/login' | '/signup' | '/bags' | '/cart' | '/shoes'
   id:
     | '__root__'
     | '/'
@@ -81,6 +90,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/signup'
     | '/_authenticated/bags'
+    | '/_authenticated/cart'
     | '/_authenticated/shoes'
   fileRoutesById: FileRoutesById
 }
@@ -128,6 +138,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedShoesRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/cart': {
+      id: '/_authenticated/cart'
+      path: '/cart'
+      fullPath: '/cart'
+      preLoaderRoute: typeof AuthenticatedCartRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/bags': {
       id: '/_authenticated/bags'
       path: '/bags'
@@ -140,11 +157,13 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedBagsRoute: typeof AuthenticatedBagsRoute
+  AuthenticatedCartRoute: typeof AuthenticatedCartRoute
   AuthenticatedShoesRoute: typeof AuthenticatedShoesRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedBagsRoute: AuthenticatedBagsRoute,
+  AuthenticatedCartRoute: AuthenticatedCartRoute,
   AuthenticatedShoesRoute: AuthenticatedShoesRoute,
 }
 
