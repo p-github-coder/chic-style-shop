@@ -172,18 +172,90 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email: string
           full_name: string
           id: string
+          requested_role: Database["public"]["Enums"]["app_role"]
+          status: Database["public"]["Enums"]["application_status"]
         }
         Insert: {
           created_at?: string
+          email?: string
           full_name?: string
           id: string
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["application_status"]
         }
         Update: {
           created_at?: string
+          email?: string
           full_name?: string
           id?: string
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          status?: Database["public"]["Enums"]["application_status"]
+        }
+        Relationships: []
+      }
+      registration_applications: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          rejection_reason: string | null
+          requested_role: Database["public"]["Enums"]["app_role"]
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["application_status"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name?: string
+          id?: string
+          rejection_reason?: string | null
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          rejection_reason?: string | null
+          requested_role?: Database["public"]["Enums"]["app_role"]
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -192,9 +264,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
+      app_role: "admin" | "customer" | "seller"
+      application_status: "pending" | "approved" | "rejected"
       product_type: "shoes" | "bags"
     }
     CompositeTypes: {
@@ -323,6 +403,8 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      app_role: ["admin", "customer", "seller"],
+      application_status: ["pending", "approved", "rejected"],
       product_type: ["shoes", "bags"],
     },
   },

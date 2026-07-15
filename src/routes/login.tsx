@@ -24,23 +24,45 @@ function LoginPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    setLoading(false);
+    const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
+      setLoading(false);
       toast.error(error.message);
       return;
     }
+
+    // Check approval status
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", signIn.user.id)
+      .maybeSingle();
+
+    if (profile?.status === "pending") {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("Your application is pending admin review.");
+      return;
+    }
+    if (profile?.status === "rejected") {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("Your application was not approved.");
+      return;
+    }
+
+    setLoading(false);
     toast.success("Welcome back!");
-    navigate({ to: "/shoes" });
+    navigate({ to: "/" });
   }
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
       <div className="hidden lg:flex flex-col justify-between p-12 text-primary-foreground relative overflow-hidden"
         style={{ background: "var(--gradient-primary)" }}>
-        <div className="flex items-center gap-2 font-display font-bold text-2xl">
+        <Link to="/" className="flex items-center gap-2 font-display font-bold text-2xl">
           <ShoppingBag className="h-7 w-7" /> Solestep
-        </div>
+        </Link>
         <div className="relative z-10">
           <h1 className="text-5xl font-display font-extrabold leading-tight">
             Step into<br />what suits you.
@@ -54,9 +76,9 @@ function LoginPage() {
 
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
-          <div className="lg:hidden flex items-center gap-2 font-display font-bold text-xl text-primary mb-8">
+          <Link to="/" className="lg:hidden flex items-center gap-2 font-display font-bold text-xl text-primary mb-8">
             <ShoppingBag className="h-6 w-6" /> Solestep
-          </div>
+          </Link>
           <h2 className="text-3xl font-display font-bold">Welcome back</h2>
           <p className="mt-2 text-muted-foreground">Sign in to continue shopping.</p>
 
@@ -93,6 +115,9 @@ function LoginPage() {
             <Link to="/signup" className="text-primary font-medium hover:underline">
               Sign up
             </Link>
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground text-center">
+            <Link to="/" className="hover:underline">← Back to home</Link>
           </p>
         </div>
       </div>
