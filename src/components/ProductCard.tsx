@@ -1,5 +1,6 @@
 import { Star, ShoppingBag, Loader2 } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -17,10 +18,16 @@ export type Product = {
 
 export function ProductCard({ product }: { product: Product }) {
   const qc = useQueryClient();
+  const navigate = useNavigate();
+
   const addToCart = useMutation({
     mutationFn: async () => {
       const { data: user } = await supabase.auth.getUser();
-      if (!user.user) throw new Error("Not signed in");
+      if (!user.user) {
+        toast.info("Please sign in to add items to your cart");
+        navigate({ to: "/login" });
+        throw new Error("Not signed in");
+      }
 
       const { data: existing } = await supabase
         .from("cart_items")
@@ -49,7 +56,9 @@ export function ProductCard({ product }: { product: Product }) {
       qc.invalidateQueries({ queryKey: ["cart"] });
       qc.invalidateQueries({ queryKey: ["cart-count"] });
     },
-    onError: (e: Error) => toast.error(e.message),
+    onError: (e: Error) => {
+      if (e.message !== "Not signed in") toast.error(e.message);
+    },
   });
 
   return (
