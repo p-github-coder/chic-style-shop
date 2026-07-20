@@ -10,9 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ShoesRouteImport } from './routes/shoes'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as BagsRouteImport } from './routes/bags'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteRouteImport } from './routes/_admin/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -27,19 +25,9 @@ const SignupRoute = SignupRouteImport.update({
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShoesRoute = ShoesRouteImport.update({
-  id: '/shoes',
-  path: '/shoes',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BagsRoute = BagsRouteImport.update({
-  id: '/bags',
-  path: '/bags',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -83,9 +71,7 @@ const AdminApplicationsRoute = AdminApplicationsRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/bags': typeof BagsRoute
   '/login': typeof LoginRoute
-  '/shoes': typeof ShoesRoute
   '/signup': typeof SignupRoute
   '/applications': typeof AdminApplicationsRoute
   '/dashboard': typeof AdminDashboardRoute
@@ -95,9 +81,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/bags': typeof BagsRoute
   '/login': typeof LoginRoute
-  '/shoes': typeof ShoesRoute
   '/signup': typeof SignupRoute
   '/applications': typeof AdminApplicationsRoute
   '/dashboard': typeof AdminDashboardRoute
@@ -110,9 +94,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/bags': typeof BagsRoute
   '/login': typeof LoginRoute
-  '/shoes': typeof ShoesRoute
   '/signup': typeof SignupRoute
   '/_admin/applications': typeof AdminApplicationsRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
@@ -124,9 +106,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/bags'
     | '/login'
-    | '/shoes'
     | '/signup'
     | '/applications'
     | '/dashboard'
@@ -136,9 +116,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/bags'
     | '/login'
-    | '/shoes'
     | '/signup'
     | '/applications'
     | '/dashboard'
@@ -150,9 +128,7 @@ export interface FileRouteTypes {
     | '/'
     | '/_admin'
     | '/_authenticated'
-    | '/bags'
     | '/login'
-    | '/shoes'
     | '/signup'
     | '/_admin/applications'
     | '/_admin/dashboard'
@@ -165,9 +141,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  BagsRoute: typeof BagsRoute
   LoginRoute: typeof LoginRoute
-  ShoesRoute: typeof ShoesRoute
   SignupRoute: typeof SignupRoute
   AdminLoginRoute: typeof AdminLoginRoute
 }
@@ -181,25 +155,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shoes': {
-      id: '/shoes'
-      path: '/shoes'
-      fullPath: '/shoes'
-      preLoaderRoute: typeof ShoesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bags': {
-      id: '/bags'
-      path: '/bags'
-      fullPath: '/bags'
-      preLoaderRoute: typeof BagsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -292,9 +252,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  BagsRoute: BagsRoute,
   LoginRoute: LoginRoute,
-  ShoesRoute: ShoesRoute,
   SignupRoute: SignupRoute,
   AdminLoginRoute: AdminLoginRoute,
 }

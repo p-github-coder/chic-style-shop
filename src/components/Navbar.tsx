@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { ShoppingBag, LogOut, Menu, X, User } from "lucide-react";
+import { ShoppingBag, LogOut, Menu, X, User, Heart, Search } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,6 +17,15 @@ export function useCartCount(enabled: boolean) {
     },
   });
 }
+
+const CATEGORY_LINKS = [
+  { slug: "bags", label: "Bags" },
+  { slug: "jewelry", label: "Jewelry" },
+  { slug: "watches", label: "Watches" },
+  { slug: "hair-accessories", label: "Hair" },
+  { slug: "fashion-accessories", label: "Accessories" },
+  { slug: "beauty-makeup", label: "Beauty" },
+];
 
 export function Navbar() {
   const navigate = useNavigate();
@@ -43,33 +52,59 @@ export function Navbar() {
     navigate({ to: "/", replace: true });
   }
 
-  const links = [
-    { to: "/" as const, label: "Home" },
-    { to: "/shoes" as const, label: "Shoes" },
-    { to: "/bags" as const, label: "Bags" },
-  ];
-
   return (
-    <header className="fixed top-0 inset-x-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
+    <header className="fixed top-0 inset-x-0 z-50 bg-background/85 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg text-primary shrink-0">
           <ShoppingBag className="h-6 w-6" />
-          <span>Solestep</span>
+          <span>Maison<span className="text-foreground">Femme</span></span>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-1">
-          {links.map((l) => (
-            <Link key={l.to} to={l.to}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                pathname === l.to ? "bg-accent text-accent-foreground" : "text-muted-foreground hover:text-foreground"
-              }`}>
-              {l.label}
+        <nav className="hidden lg:flex items-center gap-1">
+          <Link
+            to="/"
+            className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+              pathname === "/" ? "text-primary" : "text-muted-foreground hover:text-foreground"
+            }`}
+          >
+            Home
+          </Link>
+          {CATEGORY_LINKS.map((c) => (
+            <Link
+              key={c.slug}
+              to="/category/$category"
+              params={{ category: c.slug }}
+              className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
+                pathname.startsWith(`/category/${c.slug}`)
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {c.label}
             </Link>
           ))}
         </nav>
 
-        <div className="flex items-center gap-2">
-          <Link to="/cart" className="relative inline-flex items-center justify-center h-10 w-10 rounded-full hover:bg-accent transition-colors" aria-label="Cart">
+        <div className="flex items-center gap-1">
+          <Link
+            to="/search"
+            className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
+            aria-label="Search"
+          >
+            <Search className="h-5 w-5" />
+          </Link>
+          <Link
+            to="/wishlist"
+            className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
+            aria-label="Wishlist"
+          >
+            <Heart className="h-5 w-5" />
+          </Link>
+          <Link
+            to="/cart"
+            className="relative inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
+            aria-label="Cart"
+          >
             <ShoppingBag className="h-5 w-5" />
             {signedIn && cartCount > 0 && (
               <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-bold h-5 min-w-5 px-1 rounded-full flex items-center justify-center">
@@ -83,7 +118,7 @@ export function Navbar() {
               <LogOut className="h-5 w-5" />
             </Button>
           ) : (
-            <div className="hidden md:flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2 ml-2">
               <Button asChild variant="ghost" className="rounded-full">
                 <Link to="/login">Sign in</Link>
               </Button>
@@ -93,35 +128,49 @@ export function Navbar() {
             </div>
           )}
 
-          <button className="md:hidden inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
-            onClick={() => setOpen((o) => !o)} aria-label="Menu">
+          <button
+            className="lg:hidden inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
+            onClick={() => setOpen((o) => !o)}
+            aria-label="Menu"
+          >
             {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
         </div>
       </div>
 
       {open && (
-        <div className="md:hidden border-t border-border bg-background">
+        <div className="lg:hidden border-t border-border bg-background max-h-[80vh] overflow-auto">
           <div className="px-4 py-3 flex flex-col gap-1">
-            {links.map((l) => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)}
-                className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent">
-                {l.label}
+            <Link to="/" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent">
+              Home
+            </Link>
+            {CATEGORY_LINKS.map((c) => (
+              <Link
+                key={c.slug}
+                to="/category/$category"
+                params={{ category: c.slug }}
+                onClick={() => setOpen(false)}
+                className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent"
+              >
+                {c.label}
               </Link>
             ))}
+            <Link to="/wishlist" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent flex items-center gap-2">
+              <Heart className="h-4 w-4" /> Wishlist
+            </Link>
             {signedIn ? (
-              <button onClick={() => { setOpen(false); handleLogout(); }}
-                className="px-4 py-2.5 rounded-lg text-sm font-medium text-left hover:bg-accent flex items-center gap-2">
+              <button
+                onClick={() => { setOpen(false); handleLogout(); }}
+                className="px-4 py-2.5 rounded-lg text-sm font-medium text-left hover:bg-accent flex items-center gap-2"
+              >
                 <LogOut className="h-4 w-4" /> Sign out
               </button>
             ) : (
               <>
-                <Link to="/login" onClick={() => setOpen(false)}
-                  className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent flex items-center gap-2">
+                <Link to="/login" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent flex items-center gap-2">
                   <User className="h-4 w-4" /> Sign in
                 </Link>
-                <Link to="/signup" onClick={() => setOpen(false)}
-                  className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent">
+                <Link to="/signup" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent">
                   Sign up
                 </Link>
               </>
