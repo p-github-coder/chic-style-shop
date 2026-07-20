@@ -17,12 +17,12 @@ function DashboardPage() {
 
   const cards = [
     { label: "Total Users", value: data?.totalUsers ?? 0, icon: Users, color: "text-primary" },
-    { label: "Total Sellers", value: data?.totalSellers ?? 0, icon: Store, color: "text-primary" },
+    { label: "Total Orders", value: data?.totalOrders ?? 0, icon: Store, color: "text-primary" },
     { label: "Pending Applications", value: data?.pending ?? 0, icon: Clock, color: "text-amber-600" },
     { label: "Approved", value: data?.approved ?? 0, icon: CheckCircle2, color: "text-emerald-600" },
     { label: "Rejected", value: data?.rejected ?? 0, icon: XCircle, color: "text-destructive" },
     { label: "Total Products", value: data?.totalProducts ?? 0, icon: Package, color: "text-primary" },
-    { label: "Active Listings", value: data?.totalProducts ?? 0, icon: Package, color: "text-primary" },
+    { label: "Revenue (₦)", value: (data?.revenue ?? 0).toLocaleString(), icon: Package, color: "text-primary" },
   ];
 
   return (
