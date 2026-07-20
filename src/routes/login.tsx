@@ -61,23 +61,23 @@ function LoginPage() {
       <div className="hidden lg:flex flex-col justify-between p-12 text-primary-foreground relative overflow-hidden"
         style={{ background: "var(--gradient-primary)" }}>
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-2xl">
-          <ShoppingBag className="h-7 w-7" /> Solestep
+          <ShoppingBag className="h-7 w-7" /> MaisonFemme
         </Link>
         <div className="relative z-10">
           <h1 className="text-5xl font-display font-extrabold leading-tight">
-            Step into<br />what suits you.
+            Welcome back,<br />bonne journée.
           </h1>
           <p className="mt-4 text-lg opacity-90 max-w-md">
-            Curated shoes and bags from independent makers, shipped worldwide.
+            Curated bags, jewelry and beauty from the houses she loves.
           </p>
         </div>
-        <p className="text-sm opacity-80">© {new Date().getFullYear()} Solestep</p>
+        <p className="text-sm opacity-80">© {new Date().getFullYear()} MaisonFemme</p>
       </div>
 
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           <Link to="/" className="lg:hidden flex items-center gap-2 font-display font-bold text-xl text-primary mb-8">
-            <ShoppingBag className="h-6 w-6" /> Solestep
+            <ShoppingBag className="h-6 w-6" /> MaisonFemme
           </Link>
           <h2 className="text-3xl font-display font-bold">Welcome back</h2>
           <p className="mt-2 text-muted-foreground">Sign in to continue shopping.</p>

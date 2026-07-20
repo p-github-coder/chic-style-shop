@@ -9,37 +9,40 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as ShoesRouteImport } from './routes/shoes'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as BagsRouteImport } from './routes/bags'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as AdminRouteRouteImport } from './routes/_admin/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProductSlugRouteImport } from './routes/product.$slug'
+import { Route as CategoryCategoryRouteImport } from './routes/category.$category'
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
 import { Route as AdminApplicationsRouteImport } from './routes/_admin/applications'
+import { Route as CategoryCategoryBrandRouteImport } from './routes/category.$category.$brand'
 
+const WishlistRoute = WishlistRouteImport.update({
+  id: '/wishlist',
+  path: '/wishlist',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
   path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ShoesRoute = ShoesRouteImport.update({
-  id: '/shoes',
-  path: '/shoes',
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const BagsRoute = BagsRouteImport.update({
-  id: '/bags',
-  path: '/bags',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -53,6 +56,16 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProductSlugRoute = ProductSlugRouteImport.update({
+  id: '/product/$slug',
+  path: '/product/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CategoryCategoryRoute = CategoryCategoryRouteImport.update({
+  id: '/category/$category',
+  path: '/category/$category',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -80,100 +93,132 @@ const AdminApplicationsRoute = AdminApplicationsRouteImport.update({
   path: '/applications',
   getParentRoute: () => AdminRouteRoute,
 } as any)
+const CategoryCategoryBrandRoute = CategoryCategoryBrandRouteImport.update({
+  id: '/$brand',
+  path: '/$brand',
+  getParentRoute: () => CategoryCategoryRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/bags': typeof BagsRoute
   '/login': typeof LoginRoute
-  '/shoes': typeof ShoesRoute
+  '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
+  '/wishlist': typeof WishlistRoute
   '/applications': typeof AdminApplicationsRoute
   '/dashboard': typeof AdminDashboardRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/admin/login': typeof AdminLoginRoute
+  '/category/$category': typeof CategoryCategoryRouteWithChildren
+  '/product/$slug': typeof ProductSlugRoute
+  '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/bags': typeof BagsRoute
   '/login': typeof LoginRoute
-  '/shoes': typeof ShoesRoute
+  '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
+  '/wishlist': typeof WishlistRoute
   '/applications': typeof AdminApplicationsRoute
   '/dashboard': typeof AdminDashboardRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/admin/login': typeof AdminLoginRoute
+  '/category/$category': typeof CategoryCategoryRouteWithChildren
+  '/product/$slug': typeof ProductSlugRoute
+  '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_admin': typeof AdminRouteRouteWithChildren
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
-  '/bags': typeof BagsRoute
   '/login': typeof LoginRoute
-  '/shoes': typeof ShoesRoute
+  '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
+  '/wishlist': typeof WishlistRoute
   '/_admin/applications': typeof AdminApplicationsRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
   '/_authenticated/cart': typeof AuthenticatedCartRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/admin/login': typeof AdminLoginRoute
+  '/category/$category': typeof CategoryCategoryRouteWithChildren
+  '/product/$slug': typeof ProductSlugRoute
+  '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/bags'
     | '/login'
-    | '/shoes'
+    | '/search'
     | '/signup'
+    | '/wishlist'
     | '/applications'
     | '/dashboard'
     | '/cart'
     | '/checkout'
     | '/admin/login'
+    | '/category/$category'
+    | '/product/$slug'
+    | '/category/$category/$brand'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/bags'
     | '/login'
-    | '/shoes'
+    | '/search'
     | '/signup'
+    | '/wishlist'
     | '/applications'
     | '/dashboard'
     | '/cart'
     | '/checkout'
     | '/admin/login'
+    | '/category/$category'
+    | '/product/$slug'
+    | '/category/$category/$brand'
   id:
     | '__root__'
     | '/'
     | '/_admin'
     | '/_authenticated'
-    | '/bags'
     | '/login'
-    | '/shoes'
+    | '/search'
     | '/signup'
+    | '/wishlist'
     | '/_admin/applications'
     | '/_admin/dashboard'
     | '/_authenticated/cart'
     | '/_authenticated/checkout'
     | '/admin/login'
+    | '/category/$category'
+    | '/product/$slug'
+    | '/category/$category/$brand'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
-  BagsRoute: typeof BagsRoute
   LoginRoute: typeof LoginRoute
-  ShoesRoute: typeof ShoesRoute
+  SearchRoute: typeof SearchRoute
   SignupRoute: typeof SignupRoute
+  WishlistRoute: typeof WishlistRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  CategoryCategoryRoute: typeof CategoryCategoryRouteWithChildren
+  ProductSlugRoute: typeof ProductSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/wishlist': {
+      id: '/wishlist'
+      path: '/wishlist'
+      fullPath: '/wishlist'
+      preLoaderRoute: typeof WishlistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/signup': {
       id: '/signup'
       path: '/signup'
@@ -181,11 +226,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/shoes': {
-      id: '/shoes'
-      path: '/shoes'
-      fullPath: '/shoes'
-      preLoaderRoute: typeof ShoesRouteImport
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/login': {
@@ -193,13 +238,6 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/bags': {
-      id: '/bags'
-      path: '/bags'
-      fullPath: '/bags'
-      preLoaderRoute: typeof BagsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -221,6 +259,20 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/product/$slug': {
+      id: '/product/$slug'
+      path: '/product/$slug'
+      fullPath: '/product/$slug'
+      preLoaderRoute: typeof ProductSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/category/$category': {
+      id: '/category/$category'
+      path: '/category/$category'
+      fullPath: '/category/$category'
+      preLoaderRoute: typeof CategoryCategoryRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
@@ -258,6 +310,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminApplicationsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
+    '/category/$category/$brand': {
+      id: '/category/$category/$brand'
+      path: '/$brand'
+      fullPath: '/category/$category/$brand'
+      preLoaderRoute: typeof CategoryCategoryBrandRouteImport
+      parentRoute: typeof CategoryCategoryRoute
+    }
   }
 }
 
@@ -288,26 +347,29 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
+interface CategoryCategoryRouteChildren {
+  CategoryCategoryBrandRoute: typeof CategoryCategoryBrandRoute
+}
+
+const CategoryCategoryRouteChildren: CategoryCategoryRouteChildren = {
+  CategoryCategoryBrandRoute: CategoryCategoryBrandRoute,
+}
+
+const CategoryCategoryRouteWithChildren =
+  CategoryCategoryRoute._addFileChildren(CategoryCategoryRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRouteRoute: AdminRouteRouteWithChildren,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
-  BagsRoute: BagsRoute,
   LoginRoute: LoginRoute,
-  ShoesRoute: ShoesRoute,
+  SearchRoute: SearchRoute,
   SignupRoute: SignupRoute,
+  WishlistRoute: WishlistRoute,
   AdminLoginRoute: AdminLoginRoute,
+  CategoryCategoryRoute: CategoryCategoryRouteWithChildren,
+  ProductSlugRoute: ProductSlugRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

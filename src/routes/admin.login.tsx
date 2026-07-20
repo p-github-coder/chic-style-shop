@@ -18,26 +18,39 @@ function AdminLoginPage() {
   const navigate = useNavigate();
   const boot = useServerFn(bootstrapAdmin);
   const [email, setEmail] = useState("uzlivinus@gmail.com");
-  const [password, setPassword] = useState("");
+  const [password, setPassword] = useState("uzlivinus565");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Idempotent: create admin account if missing
-    boot({}).catch(() => {});
+    // Idempotent: create OR force-reset admin account so credentials always match
+    boot({}).catch(() => {}).finally(() => setReady(true));
   }, [boot]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
-    const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      setLoading(false);
-      toast.error(error.message);
-      return;
+    // Ensure bootstrap has run at least once before trying
+    if (!ready) {
+      try { await boot({}); } catch { /* ignore */ }
+    }
+    let userId: string | undefined;
+    const first = await supabase.auth.signInWithPassword({ email, password });
+    if (first.error) {
+      try { await boot({}); } catch { /* ignore */ }
+      const retry = await supabase.auth.signInWithPassword({ email, password });
+      if (retry.error) {
+        setLoading(false);
+        toast.error(retry.error.message);
+        return;
+      }
+      userId = retry.data.user?.id;
+    } else {
+      userId = first.data.user?.id;
     }
     const { data: isAdmin } = await supabase.rpc("has_role", {
-      _user_id: signIn.user.id,
+      _user_id: userId!,
       _role: "admin",
     });
     if (!isAdmin) {

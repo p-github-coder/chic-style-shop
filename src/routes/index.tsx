@@ -1,6 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowRight, Sparkles, Truck, ShieldCheck } from "lucide-react";
+import { ArrowRight, Sparkles, Truck, ShieldCheck, Gem } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
 import { ProductCard, type Product } from "@/components/ProductCard";
@@ -8,20 +8,70 @@ import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: "MaisonFemme — Premium Women's Accessories" },
+      {
+        name: "description",
+        content:
+          "Curated bags, jewelry, watches, hair accessories, fashion accessories and beauty essentials from the world's finest brands. Delivered across Nigeria.",
+      },
+      { property: "og:title", content: "MaisonFemme — Premium Women's Accessories" },
+      {
+        property: "og:description",
+        content: "Luxury bags, jewelry, watches and beauty. Free delivery on orders over ₦50,000.",
+      },
+    ],
+  }),
   component: LandingPage,
 });
 
+type Category = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  hero_image: string;
+};
+
 function LandingPage() {
-  const { data: featured } = useQuery({
-    queryKey: ["products", "featured"],
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, slug, name, description, hero_image")
+        .order("sort_order");
+      if (error) throw error;
+      return data as Category[];
+    },
+  });
+
+  const { data: bestSellers = [] } = useQuery({
+    queryKey: ["products", "best-sellers"],
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("*")
+        .select("id, slug, name, description, price, image_url, images, rating, brands(name, slug)")
+        .eq("best_seller", true)
         .order("rating", { ascending: false })
         .limit(8);
       if (error) throw error;
-      return data as Product[];
+      return data as unknown as Product[];
+    },
+  });
+
+  const { data: newArrivals = [] } = useQuery({
+    queryKey: ["products", "new-arrivals"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("products")
+        .select("id, slug, name, description, price, image_url, images, rating, brands(name, slug)")
+        .eq("new_arrival", true)
+        .order("created_at", { ascending: false })
+        .limit(8);
+      if (error) throw error;
+      return data as unknown as Product[];
     },
   });
 
@@ -31,35 +81,45 @@ function LandingPage() {
       <main className="pt-16">
         {/* Hero */}
         <section className="relative overflow-hidden" style={{ background: "var(--gradient-primary)" }}>
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-16 sm:py-24 text-primary-foreground">
+          <div className="absolute inset-0 opacity-30 mix-blend-overlay bg-[url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600')] bg-cover bg-center" />
+          <div className="relative max-w-7xl mx-auto px-4 sm:px-6 py-20 sm:py-28 text-primary-foreground">
             <div className="max-w-2xl">
-              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-sm backdrop-blur">
-                <Sparkles className="h-4 w-4" /> New season drops
+              <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs sm:text-sm backdrop-blur">
+                <Sparkles className="h-3.5 w-3.5" /> New Season · Autumn Edit
               </div>
-              <h1 className="mt-5 text-5xl sm:text-6xl font-display font-extrabold leading-tight">
-                Shoes and bags,<br />built for every step.
+              <h1 className="mt-5 text-5xl sm:text-7xl font-display font-extrabold leading-[1.05]">
+                Timeless<br />by design.
               </h1>
-              <p className="mt-4 text-lg opacity-90 max-w-lg">
-                Discover premium fashion accessories from independent makers — curated weekly, shipped worldwide.
+              <p className="mt-5 text-lg sm:text-xl opacity-90 max-w-lg">
+                Bags, jewelry, watches and beauty from the houses she loves. Curated for the modern woman.
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Button asChild size="lg" variant="secondary" className="rounded-full">
-                  <Link to="/shoes">Shop shoes <ArrowRight className="ml-2 h-4 w-4" /></Link>
+                  <Link to="/category/$category" params={{ category: "bags" }}>
+                    Shop bags <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
                 </Button>
-                <Button asChild size="lg" variant="outline" className="rounded-full bg-white/10 border-white/30 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground">
-                  <Link to="/bags">Shop bags</Link>
+                <Button
+                  asChild
+                  size="lg"
+                  variant="outline"
+                  className="rounded-full bg-white/10 border-white/30 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
+                >
+                  <Link to="/category/$category" params={{ category: "jewelry" }}>
+                    Explore jewelry
+                  </Link>
                 </Button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Feature strip */}
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid sm:grid-cols-3 gap-4">
+        {/* Trust bar */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 grid sm:grid-cols-3 gap-4">
           {[
-            { icon: Truck, title: "Free shipping over $99", desc: "Delivered to your door." },
-            { icon: ShieldCheck, title: "Secure checkout", desc: "Protected payments." },
-            { icon: Sparkles, title: "Curated weekly", desc: "New drops every Friday." },
+            { icon: Truck, title: "Free delivery over ₦50,000", desc: "Fast nationwide shipping." },
+            { icon: ShieldCheck, title: "Secure payments", desc: "Protected checkout." },
+            { icon: Gem, title: "100% authentic", desc: "Sourced from official houses." },
           ].map((f) => (
             <div key={f.title} className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border">
               <div className="h-11 w-11 rounded-full bg-accent flex items-center justify-center text-primary shrink-0">
@@ -73,21 +133,131 @@ function LandingPage() {
           ))}
         </section>
 
-        {/* Featured products */}
+        {/* Shop by category */}
         <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
-          <div className="flex items-end justify-between mb-6">
-            <div>
-              <h2 className="text-3xl sm:text-4xl font-display font-extrabold">Trending now</h2>
-              <p className="text-muted-foreground mt-1">Handpicked from our top-rated pieces.</p>
-            </div>
-            <Link to="/shoes" className="hidden sm:inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-              See all <ArrowRight className="h-4 w-4" />
-            </Link>
+          <div className="mb-8">
+            <h2 className="text-3xl sm:text-4xl font-display font-extrabold">Shop by category</h2>
+            <p className="text-muted-foreground mt-1">From investment pieces to everyday staples.</p>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {(featured ?? []).map((p) => <ProductCard key={p.id} product={p} />)}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+            {categories.map((c) => (
+              <Link
+                key={c.id}
+                to="/category/$category"
+                params={{ category: c.slug }}
+                className="group relative aspect-[4/5] overflow-hidden rounded-3xl bg-card border border-border"
+              >
+                <img
+                  src={c.hero_image}
+                  alt={c.name}
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
+                  <h3 className="font-display font-extrabold text-2xl">{c.name}</h3>
+                  <p className="text-sm opacity-90 mt-1 line-clamp-2">{c.description}</p>
+                  <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium">
+                    Shop now <ArrowRight className="h-3.5 w-3.5" />
+                  </div>
+                </div>
+              </Link>
+            ))}
           </div>
         </section>
+
+        {/* Best sellers */}
+        {bestSellers.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-16">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-display font-extrabold">Best sellers</h2>
+                <p className="text-muted-foreground mt-1">Pieces our customers love most.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {bestSellers.map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+          </section>
+        )}
+
+        {/* New arrivals */}
+        {newArrivals.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-24">
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <h2 className="text-3xl sm:text-4xl font-display font-extrabold">New arrivals</h2>
+                <p className="text-muted-foreground mt-1">Fresh in this week.</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+              {newArrivals.map((p) => <ProductCard key={p.id} product={p} />)}
+            </div>
+          </section>
+        )}
+
+        {/* Newsletter */}
+        <section className="bg-accent">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 py-16 text-center">
+            <h2 className="text-3xl sm:text-4xl font-display font-extrabold">Join the list</h2>
+            <p className="mt-3 text-muted-foreground max-w-lg mx-auto">
+              Be first to know about new collections, private sales and members-only perks.
+            </p>
+            <form
+              onSubmit={(e) => e.preventDefault()}
+              className="mt-6 flex flex-col sm:flex-row gap-2 max-w-md mx-auto"
+            >
+              <input
+                type="email"
+                required
+                placeholder="you@example.com"
+                className="flex-1 h-12 px-5 rounded-full bg-background border border-border outline-none focus:ring-2 focus:ring-primary"
+              />
+              <Button type="submit" className="h-12 rounded-full px-6">Subscribe</Button>
+            </form>
+          </div>
+        </section>
+
+        {/* Footer */}
+        <footer className="border-t border-border">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid md:grid-cols-4 gap-8 text-sm">
+            <div>
+              <div className="font-display font-bold text-lg text-primary">MaisonFemme</div>
+              <p className="mt-2 text-muted-foreground">Premium women's accessories, delivered across Nigeria.</p>
+            </div>
+            <div>
+              <div className="font-semibold mb-3">Shop</div>
+              <ul className="space-y-2 text-muted-foreground">
+                {categories.slice(0, 4).map((c) => (
+                  <li key={c.id}>
+                    <Link to="/category/$category" params={{ category: c.slug }} className="hover:text-foreground">
+                      {c.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <div className="font-semibold mb-3">Help</div>
+              <ul className="space-y-2 text-muted-foreground">
+                <li>Shipping & returns</li>
+                <li>Contact us</li>
+                <li>FAQs</li>
+              </ul>
+            </div>
+            <div>
+              <div className="font-semibold mb-3">Account</div>
+              <ul className="space-y-2 text-muted-foreground">
+                <li><Link to="/login" className="hover:text-foreground">Sign in</Link></li>
+                <li><Link to="/signup" className="hover:text-foreground">Create account</Link></li>
+                <li><Link to="/wishlist" className="hover:text-foreground">Wishlist</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="border-t border-border py-6 text-center text-xs text-muted-foreground">
+            © {new Date().getFullYear()} MaisonFemme. All rights reserved.
+          </div>
+        </footer>
       </main>
 
       {/* Discreet admin link */}
