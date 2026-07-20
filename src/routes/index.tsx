@@ -10,16 +10,16 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "MaisonFemme — Premium Women's Accessories" },
+      { title: "PameLuxury— Premium Women's Accessories" },
       {
         name: "description",
         content:
           "Curated bags, jewelry, watches, hair accessories, fashion accessories and beauty essentials from the world's finest brands. Delivered across Nigeria.",
       },
-      { property: "og:title", content: "MaisonFemme — Premium Women's Accessories" },
+      { property: "og:title", content: "PameLuxury— Premium Women's Accessories" },
       {
         property: "og:description",
-        content: "Luxury bags, jewelry, watches and beauty. Free delivery on orders over ₦50,000.",
+        content: "Curated bags, jewelry, watches, hair accessories, fashion accessories and beauty essentials from the world's finest brands. Delivered across Nigeria.",
       },
     ],
   }),
