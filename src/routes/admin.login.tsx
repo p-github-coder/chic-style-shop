@@ -35,9 +35,9 @@ function AdminLoginPage() {
     if (!ready) {
       try { await boot({}); } catch { /* ignore */ }
     }
-    const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      // If password drifted, try one bootstrap + retry
+    let userId: string | undefined;
+    const first = await supabase.auth.signInWithPassword({ email, password });
+    if (first.error) {
       try { await boot({}); } catch { /* ignore */ }
       const retry = await supabase.auth.signInWithPassword({ email, password });
       if (retry.error) {
@@ -45,10 +45,12 @@ function AdminLoginPage() {
         toast.error(retry.error.message);
         return;
       }
-      signIn.user = retry.data.user;
+      userId = retry.data.user?.id;
+    } else {
+      userId = first.data.user?.id;
     }
     const { data: isAdmin } = await supabase.rpc("has_role", {
-      _user_id: signIn!.user!.id,
+      _user_id: userId!,
       _role: "admin",
     });
     if (!isAdmin) {
