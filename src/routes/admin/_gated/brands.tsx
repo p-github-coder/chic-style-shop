@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { upsertBrand, deleteBrand } from "@/lib/admin.functions";
+import { SingleImageUploader } from "@/components/ImageUploader";
 
 export const Route = createFileRoute("/admin/_gated/brands")({
   component: BrandsPage,
@@ -105,7 +106,9 @@ function BrandsPage() {
               </div>
               <div className="space-y-1.5"><Label className="text-xs uppercase text-muted-foreground">Name</Label><Input value={editing.name ?? ""} onChange={(e) => setEditing({ ...editing, name: e.target.value })} required /></div>
               <div className="space-y-1.5"><Label className="text-xs uppercase text-muted-foreground">Slug</Label><Input value={editing.slug ?? ""} onChange={(e) => setEditing({ ...editing, slug: e.target.value })} required /></div>
-              <div className="space-y-1.5"><Label className="text-xs uppercase text-muted-foreground">Logo URL</Label><Input value={editing.logo_url ?? ""} onChange={(e) => setEditing({ ...editing, logo_url: e.target.value })} /></div>
+              <div className="space-y-1.5"><Label className="text-xs uppercase text-muted-foreground">Logo</Label>
+                <SingleImageUploader bucket="brand-logos" value={editing.logo_url ?? ""} onChange={(url) => setEditing({ ...editing, logo_url: url })} label="Logo" />
+              </div>
               <Button type="submit" className="w-full">Save</Button>
             </form>
           </div>

@@ -375,70 +375,106 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age: number | null
+          avatar_url: string | null
+          city: string | null
           created_at: string
           email: string
           full_name: string
           id: string
+          phone: string | null
           requested_role: Database["public"]["Enums"]["app_role"]
+          state: string | null
           status: Database["public"]["Enums"]["application_status"]
+          updated_at: string
+          username: string | null
         }
         Insert: {
+          age?: number | null
+          avatar_url?: string | null
+          city?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id: string
+          phone?: string | null
           requested_role?: Database["public"]["Enums"]["app_role"]
+          state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          username?: string | null
         }
         Update: {
+          age?: number | null
+          avatar_url?: string | null
+          city?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          phone?: string | null
           requested_role?: Database["public"]["Enums"]["app_role"]
+          state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
+          updated_at?: string
+          username?: string | null
         }
         Relationships: []
       }
       registration_applications: {
         Row: {
+          age: number | null
+          city: string | null
           created_at: string
           email: string
           full_name: string
           id: string
+          phone: string | null
           rejection_reason: string | null
           requested_role: Database["public"]["Enums"]["app_role"]
           reviewed_at: string | null
           reviewed_by: string | null
+          state: string | null
           status: Database["public"]["Enums"]["application_status"]
           updated_at: string
           user_id: string
+          username: string | null
         }
         Insert: {
+          age?: number | null
+          city?: string | null
           created_at?: string
           email: string
           full_name?: string
           id?: string
+          phone?: string | null
           rejection_reason?: string | null
           requested_role?: Database["public"]["Enums"]["app_role"]
           reviewed_at?: string | null
           reviewed_by?: string | null
+          state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
           updated_at?: string
           user_id: string
+          username?: string | null
         }
         Update: {
+          age?: number | null
+          city?: string | null
           created_at?: string
           email?: string
           full_name?: string
           id?: string
+          phone?: string | null
           rejection_reason?: string | null
           requested_role?: Database["public"]["Enums"]["app_role"]
           reviewed_at?: string | null
           reviewed_by?: string | null
+          state?: string | null
           status?: Database["public"]["Enums"]["application_status"]
           updated_at?: string
           user_id?: string
+          username?: string | null
         }
         Relationships: []
       }

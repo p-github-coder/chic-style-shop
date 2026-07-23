@@ -3,7 +3,7 @@ import {
   LayoutDashboard, Users, Package, Tags, ShoppingCart, UserCog,
   Ticket, Bell, Plug, Headphones, Settings, LogOut, ShoppingBag, Bookmark,
 } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdminClient as supabase } from "@/integrations/supabase/admin-client";
 import { useQueryClient } from "@tanstack/react-query";
 
 const nav = [

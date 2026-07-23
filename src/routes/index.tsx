@@ -259,14 +259,6 @@ function LandingPage() {
           </div>
         </footer>
       </main>
-
-      {/* Discreet admin link */}
-      <Link
-        to="/admin/login"
-        className="fixed bottom-4 right-4 z-40 text-xs text-muted-foreground hover:text-foreground bg-background/70 backdrop-blur px-3 py-1.5 rounded-full border border-border"
-      >
-        Admin
-      </Link>
     </div>
   );
 }

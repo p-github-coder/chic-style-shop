@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
+import { supabaseAdminClient as supabase } from "@/integrations/supabase/admin-client";
 import { AdminSidebar } from "@/components/AdminSidebar";
 
 export const Route = createFileRoute("/admin/_gated")({

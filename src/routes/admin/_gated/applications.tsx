@@ -15,6 +15,11 @@ type Application = {
   id: string;
   full_name: string;
   email: string;
+  username: string | null;
+  phone: string | null;
+  age: number | null;
+  state: string | null;
+  city: string | null;
   requested_role: "admin" | "customer" | "seller";
   status: "pending" | "approved" | "rejected";
   rejection_reason: string | null;
@@ -96,7 +101,9 @@ function ApplicationsPage() {
               <tr className="text-left">
                 <th className="px-4 py-3 font-medium">Name</th>
                 <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Role</th>
+                <th className="px-4 py-3 font-medium">Phone</th>
+                <th className="px-4 py-3 font-medium">Age</th>
+                <th className="px-4 py-3 font-medium">Location</th>
                 <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3 font-medium">Date</th>
                 <th className="px-4 py-3 font-medium text-right">Actions</th>
@@ -105,9 +112,14 @@ function ApplicationsPage() {
             <tbody>
               {filtered.map((app) => (
                 <tr key={app.id} className="border-t border-border">
-                  <td className="px-4 py-3 font-medium">{app.full_name || "—"}</td>
+                  <td className="px-4 py-3">
+                    <div className="font-medium">{app.full_name || "—"}</div>
+                    {app.username && <div className="text-xs text-muted-foreground">@{app.username}</div>}
+                  </td>
                   <td className="px-4 py-3 text-muted-foreground">{app.email}</td>
-                  <td className="px-4 py-3 capitalize">{app.requested_role}</td>
+                  <td className="px-4 py-3 text-xs">{app.phone || "—"}</td>
+                  <td className="px-4 py-3 text-xs">{app.age ?? "—"}</td>
+                  <td className="px-4 py-3 text-xs">{[app.city, app.state].filter(Boolean).join(", ") || "—"}</td>
                   <td className="px-4 py-3">{badge(app.status)}</td>
                   <td className="px-4 py-3 text-muted-foreground">
                     {new Date(app.created_at).toLocaleDateString()}
