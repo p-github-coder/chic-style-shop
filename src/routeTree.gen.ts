@@ -23,6 +23,7 @@ import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/c
 import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
 import { Route as CategoryCategoryBrandRouteImport } from './routes/category.$category.$brand'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
+import { Route as AdminGatedProductsRouteImport } from './routes/admin/_gated/products'
 import { Route as AdminGatedOrdersRouteImport } from './routes/admin/_gated/orders'
 import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
 import { Route as AdminGatedCategoriesRouteImport } from './routes/admin/_gated/categories'
@@ -98,6 +99,11 @@ const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedProductsRoute = AdminGatedProductsRouteImport.update({
+  id: '/products',
+  path: '/products',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedOrdersRoute = AdminGatedOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
@@ -141,6 +147,7 @@ export interface FileRoutesByFullPath {
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
+  '/admin/products': typeof AdminGatedProductsRoute
   '/admin/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -161,6 +168,7 @@ export interface FileRoutesByTo {
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
+  '/admin/products': typeof AdminGatedProductsRoute
   '/admin/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -183,6 +191,7 @@ export interface FileRoutesById {
   '/admin/_gated/categories': typeof AdminGatedCategoriesRoute
   '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
   '/admin/_gated/orders': typeof AdminGatedOrdersRoute
+  '/admin/_gated/products': typeof AdminGatedProductsRoute
   '/admin/_gated/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -205,6 +214,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/dashboard'
     | '/admin/orders'
+    | '/admin/products'
     | '/admin/users'
     | '/category/$category/$brand'
   fileRoutesByTo: FileRoutesByTo
@@ -225,6 +235,7 @@ export interface FileRouteTypes {
     | '/admin/categories'
     | '/admin/dashboard'
     | '/admin/orders'
+    | '/admin/products'
     | '/admin/users'
     | '/category/$category/$brand'
   id:
@@ -246,6 +257,7 @@ export interface FileRouteTypes {
     | '/admin/_gated/categories'
     | '/admin/_gated/dashboard'
     | '/admin/_gated/orders'
+    | '/admin/_gated/products'
     | '/admin/_gated/users'
     | '/category/$category/$brand'
   fileRoutesById: FileRoutesById
@@ -363,6 +375,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedUsersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/products': {
+      id: '/admin/_gated/products'
+      path: '/products'
+      fullPath: '/admin/products'
+      preLoaderRoute: typeof AdminGatedProductsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/orders': {
       id: '/admin/_gated/orders'
       path: '/orders'
@@ -420,6 +439,7 @@ interface AdminGatedRouteRouteChildren {
   AdminGatedCategoriesRoute: typeof AdminGatedCategoriesRoute
   AdminGatedDashboardRoute: typeof AdminGatedDashboardRoute
   AdminGatedOrdersRoute: typeof AdminGatedOrdersRoute
+  AdminGatedProductsRoute: typeof AdminGatedProductsRoute
   AdminGatedUsersRoute: typeof AdminGatedUsersRoute
 }
 
@@ -429,6 +449,7 @@ const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
   AdminGatedCategoriesRoute: AdminGatedCategoriesRoute,
   AdminGatedDashboardRoute: AdminGatedDashboardRoute,
   AdminGatedOrdersRoute: AdminGatedOrdersRoute,
+  AdminGatedProductsRoute: AdminGatedProductsRoute,
   AdminGatedUsersRoute: AdminGatedUsersRoute,
 }
 
