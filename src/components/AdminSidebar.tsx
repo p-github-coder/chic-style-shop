@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
-  LayoutDashboard, Users, Package, Tags, ShoppingCart, Boxes, CreditCard,
-  BarChart3, Ticket, Bell, Plug, Headphones, Settings, FileClock, LogOut, ShoppingBag,
+  LayoutDashboard, Users, Package, Tags, ShoppingCart, UserCog,
+  Ticket, Bell, Plug, Headphones, Settings, LogOut, ShoppingBag, Bookmark,
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -9,18 +9,16 @@ import { useQueryClient } from "@tanstack/react-query";
 const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, enabled: true },
   { to: "/admin/applications", label: "Applications", icon: Users, enabled: true },
-  { label: "Products", icon: Package },
-  { label: "Categories", icon: Tags },
-  { label: "Orders", icon: ShoppingCart },
-  { label: "Inventory", icon: Boxes },
-  { label: "Payments", icon: CreditCard },
-  { label: "Reports", icon: BarChart3 },
+  { to: "/admin/users", label: "Customers", icon: UserCog, enabled: true },
+  { to: "/admin/products", label: "Products", icon: Package, enabled: true },
+  { to: "/admin/categories", label: "Categories", icon: Tags, enabled: true },
+  { to: "/admin/brands", label: "Brands", icon: Bookmark, enabled: true },
+  { to: "/admin/orders", label: "Orders", icon: ShoppingCart, enabled: true },
   { label: "Coupons", icon: Ticket },
   { label: "Notifications", icon: Bell },
   { label: "Integrations", icon: Plug },
   { label: "Support", icon: Headphones },
   { label: "Settings", icon: Settings },
-  { label: "Audit Logs", icon: FileClock },
 ] as const;
 
 export function AdminSidebar() {
@@ -39,13 +37,13 @@ export function AdminSidebar() {
     <aside className="w-64 shrink-0 border-r border-border bg-card min-h-screen sticky top-0 flex flex-col">
       <div className="p-6 border-b border-border">
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg text-primary">
-          <ShoppingBag className="h-6 w-6" /> Solestep
+          <ShoppingBag className="h-6 w-6" /> PameLuxury
         </Link>
         <div className="mt-1 text-xs text-muted-foreground">Admin console</div>
       </div>
       <nav className="flex-1 p-3 overflow-auto">
         {nav.map((item) => {
-          const active = "to" in item && pathname === item.to;
+          const active = "to" in item && pathname.startsWith(item.to);
           const Content = (
             <>
               <item.icon className="h-4 w-4 shrink-0" />
