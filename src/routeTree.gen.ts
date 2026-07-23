@@ -21,7 +21,11 @@ import { Route as CategoryCategoryRouteImport } from './routes/category.$categor
 import { Route as AdminLoginRouteImport } from './routes/admin.login'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/cart'
+import { Route as AdminUsersRouteImport } from './routes/_admin/users'
+import { Route as AdminOrdersRouteImport } from './routes/_admin/orders'
 import { Route as AdminDashboardRouteImport } from './routes/_admin/dashboard'
+import { Route as AdminCategoriesRouteImport } from './routes/_admin/categories'
+import { Route as AdminBrandsRouteImport } from './routes/_admin/brands'
 import { Route as AdminApplicationsRouteImport } from './routes/_admin/applications'
 import { Route as CategoryCategoryBrandRouteImport } from './routes/category.$category.$brand'
 
@@ -83,9 +87,29 @@ const AuthenticatedCartRoute = AuthenticatedCartRouteImport.update({
   path: '/cart',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AdminUsersRoute = AdminUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminOrdersRoute = AdminOrdersRouteImport.update({
+  id: '/orders',
+  path: '/orders',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const AdminDashboardRoute = AdminDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminCategoriesRoute = AdminCategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
+const AdminBrandsRoute = AdminBrandsRouteImport.update({
+  id: '/brands',
+  path: '/brands',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminApplicationsRoute = AdminApplicationsRouteImport.update({
@@ -106,7 +130,11 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
   '/applications': typeof AdminApplicationsRoute
+  '/brands': typeof AdminBrandsRoute
+  '/categories': typeof AdminCategoriesRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/orders': typeof AdminOrdersRoute
+  '/users': typeof AdminUsersRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/admin/login': typeof AdminLoginRoute
@@ -121,7 +149,11 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
   '/applications': typeof AdminApplicationsRoute
+  '/brands': typeof AdminBrandsRoute
+  '/categories': typeof AdminCategoriesRoute
   '/dashboard': typeof AdminDashboardRoute
+  '/orders': typeof AdminOrdersRoute
+  '/users': typeof AdminUsersRoute
   '/cart': typeof AuthenticatedCartRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/admin/login': typeof AdminLoginRoute
@@ -139,7 +171,11 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/wishlist': typeof WishlistRoute
   '/_admin/applications': typeof AdminApplicationsRoute
+  '/_admin/brands': typeof AdminBrandsRoute
+  '/_admin/categories': typeof AdminCategoriesRoute
   '/_admin/dashboard': typeof AdminDashboardRoute
+  '/_admin/orders': typeof AdminOrdersRoute
+  '/_admin/users': typeof AdminUsersRoute
   '/_authenticated/cart': typeof AuthenticatedCartRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/admin/login': typeof AdminLoginRoute
@@ -156,7 +192,11 @@ export interface FileRouteTypes {
     | '/signup'
     | '/wishlist'
     | '/applications'
+    | '/brands'
+    | '/categories'
     | '/dashboard'
+    | '/orders'
+    | '/users'
     | '/cart'
     | '/checkout'
     | '/admin/login'
@@ -171,7 +211,11 @@ export interface FileRouteTypes {
     | '/signup'
     | '/wishlist'
     | '/applications'
+    | '/brands'
+    | '/categories'
     | '/dashboard'
+    | '/orders'
+    | '/users'
     | '/cart'
     | '/checkout'
     | '/admin/login'
@@ -188,7 +232,11 @@ export interface FileRouteTypes {
     | '/signup'
     | '/wishlist'
     | '/_admin/applications'
+    | '/_admin/brands'
+    | '/_admin/categories'
     | '/_admin/dashboard'
+    | '/_admin/orders'
+    | '/_admin/users'
     | '/_authenticated/cart'
     | '/_authenticated/checkout'
     | '/admin/login'
@@ -296,11 +344,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedCartRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_admin/users': {
+      id: '/_admin/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AdminUsersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/_admin/orders': {
+      id: '/_admin/orders'
+      path: '/orders'
+      fullPath: '/orders'
+      preLoaderRoute: typeof AdminOrdersRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/_admin/dashboard': {
       id: '/_admin/dashboard'
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/_admin/categories': {
+      id: '/_admin/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof AdminCategoriesRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
+    '/_admin/brands': {
+      id: '/_admin/brands'
+      path: '/brands'
+      fullPath: '/brands'
+      preLoaderRoute: typeof AdminBrandsRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/_admin/applications': {
@@ -322,12 +398,20 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteRouteChildren {
   AdminApplicationsRoute: typeof AdminApplicationsRoute
+  AdminBrandsRoute: typeof AdminBrandsRoute
+  AdminCategoriesRoute: typeof AdminCategoriesRoute
   AdminDashboardRoute: typeof AdminDashboardRoute
+  AdminOrdersRoute: typeof AdminOrdersRoute
+  AdminUsersRoute: typeof AdminUsersRoute
 }
 
 const AdminRouteRouteChildren: AdminRouteRouteChildren = {
   AdminApplicationsRoute: AdminApplicationsRoute,
+  AdminBrandsRoute: AdminBrandsRoute,
+  AdminCategoriesRoute: AdminCategoriesRoute,
   AdminDashboardRoute: AdminDashboardRoute,
+  AdminOrdersRoute: AdminOrdersRoute,
+  AdminUsersRoute: AdminUsersRoute,
 }
 
 const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
@@ -373,3 +457,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
