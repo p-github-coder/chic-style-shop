@@ -14,6 +14,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      addresses: {
+        Row: {
+          address_line: string
+          city: string
+          country: string
+          created_at: string
+          full_name: string
+          id: string
+          is_default: boolean
+          label: string
+          phone: string
+          state: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address_line: string
+          city: string
+          country?: string
+          created_at?: string
+          full_name: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          phone?: string
+          state?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address_line?: string
+          city?: string
+          country?: string
+          created_at?: string
+          full_name?: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          phone?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       brands: {
         Row: {
           category_id: string
@@ -170,42 +215,63 @@ export type Database = {
       }
       orders: {
         Row: {
+          city: string
+          country: string
           created_at: string
           customer_email: string
           customer_name: string
           delivery_fee: number
           id: string
+          notes: string
+          order_number: string | null
           payment_method: string
+          phone: string
           shipping_address: string
+          state: string
           status: string
           subtotal: number
           total: number
+          updated_at: string
           user_id: string
         }
         Insert: {
+          city?: string
+          country?: string
           created_at?: string
           customer_email: string
           customer_name: string
           delivery_fee: number
           id?: string
+          notes?: string
+          order_number?: string | null
           payment_method: string
+          phone?: string
           shipping_address: string
+          state?: string
           status?: string
           subtotal: number
           total: number
+          updated_at?: string
           user_id: string
         }
         Update: {
+          city?: string
+          country?: string
           created_at?: string
           customer_email?: string
           customer_name?: string
           delivery_fee?: number
           id?: string
+          notes?: string
+          order_number?: string | null
           payment_method?: string
+          phone?: string
           shipping_address?: string
+          state?: string
           status?: string
           subtotal?: number
           total?: number
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -517,7 +583,7 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "customer" | "seller"
-      application_status: "pending" | "approved" | "rejected"
+      application_status: "pending" | "approved" | "rejected" | "suspended"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -646,7 +712,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "customer", "seller"],
-      application_status: ["pending", "approved", "rejected"],
+      application_status: ["pending", "approved", "rejected", "suspended"],
     },
   },
 } as const
