@@ -100,7 +100,7 @@ function OrdersPage() {
         <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4" onClick={() => setOpenId(null)}>
           <div className="bg-card rounded-3xl max-w-2xl w-full max-h-[85vh] overflow-auto p-6 relative" onClick={(e) => e.stopPropagation()}>
             <button className="absolute top-4 right-4" onClick={() => setOpenId(null)}><X className="h-5 w-5" /></button>
-            {!detail ? <Loader2 className="h-5 w-5 animate-spin" /> : (
+            {!detail || !detail.order ? <Loader2 className="h-5 w-5 animate-spin" /> : (
               <>
                 <h2 className="font-display font-bold text-2xl">{detail.order.order_number}</h2>
                 <p className="text-sm text-muted-foreground mt-1">{new Date(detail.order.created_at).toLocaleString()}</p>
