@@ -1,65 +1,44 @@
-This is roughly 4–5 sessions of work. I'll ship it in phases so you can review each one. Sensible defaults I'm locking in based on your request:
 
-- **Deployment:** staying on Lovable Publish (one-click deploy of frontend + server functions + DB). Netlify can't run the auth/admin server functions without a full rewrite — click **Publish** top-right when ready. GitHub sync is under the "+" menu → GitHub if you want the code mirrored.
-- **Currency:** wipe current 16 shoes/bags and reseed everything in ₦ with the new women's-accessories catalog.
-- **Roles:** customer + admin only (seller signup removed — admin owns the catalog).
-- **Admin login:** the credentials and bootstrap logic look correct in code; I'll add a "Reset admin password" server call to the login page so the account is force-reset to `uzlivinus565` if it already exists with a different password. Fixes the most likely cause.
+## Root cause
 
----
+`src/routes/_admin/` uses TanStack's pathless-layout convention (leading `_`). The `_admin` segment is stripped from URLs, so:
 
-## Phase 1 — this session (foundation)
+- `src/routes/_admin/dashboard.tsx` → `/dashboard` (not `/admin/dashboard`)
+- `src/routes/_admin/users.tsx` → `/users`
+- …and so on for orders, brands, categories, applications.
 
-**Schema (single migration, wipes products):**
-- `categories` (slug, name, icon, sort_order)
-- `subcategories` (category_id, slug, name)
-- `brands` (category_id, slug, name, logo_url)
-- `products` — new columns: `brand_id`, `subcategory_id`, `images text[]`, `colors text[]`, `sizes text[]`, `shades text[]`, `stock int`, `specifications jsonb`, `ingredients text`. Price stays numeric, treated as ₦.
-- `reviews` (product_id, user_id, rating, title, body)
-- `wishlist_items` (user_id, product_id)
-- RLS + GRANTs for each. Public SELECT on catalog tables (`TO anon`), owner-scoped policies on cart/wishlist/reviews.
-- Seed: 6 categories, ~25 brands, ~60 products with real ₦ prices and Unsplash images.
+Meanwhile the sidebar, admin login redirect, and dashboard "View all" links all point to `/admin/dashboard`, `/admin/users`, etc. → 404 on every admin page.
 
-**Admin login fix:**
-- New `resetAdminPassword` server fn — force-resets `uzlivinus@gmail.com` to `uzlivinus565` on every visit to `/admin/login` (idempotent, uses service role). No more "invalid credentials" if the account drifted.
-- Better error surfacing on login failure.
+## Fix
 
-**Product Details page** at `/product/$slug`:
-- Image gallery + zoom on hover
-- Name, brand, ₦ price, description, specs, colors/sizes/shades pickers, stock badge
-- Live rating average + reviews list + "Write a review" (auth required)
-- Wishlist toggle, Add to Cart, Buy Now
-- Related products (same brand/subcategory)
+Restructure the admin routes so the URLs actually live under `/admin/*`, while keeping `/admin/login` public (outside the auth gate):
 
-**Public browsing:**
-- Homepage: hero + shop-by-category tiles (6 categories)
-- `/category/$slug` — subcategories + brands list
-- `/category/$slug/$brand` — product grid with search, color/price filters, sort
-- Wishlist icon on every product card
-- Cart guard: browse freely, sign-in required at checkout
+```
+src/routes/
+  admin.login.tsx                 (unchanged — public)
+  admin/
+    _gated/
+      route.tsx                   (auth+admin gate + AdminSidebar layout)
+      dashboard.tsx               → /admin/dashboard
+      applications.tsx            → /admin/applications
+      users.tsx                   → /admin/users
+      products.tsx                → /admin/products  (new page from prior plan)
+      categories.tsx              → /admin/categories
+      brands.tsx                  → /admin/brands
+      orders.tsx                  → /admin/orders
+```
 
-**Form validation:** zod schemas on signup/login/checkout with inline errors.
+Steps:
+1. Move every file from `src/routes/_admin/` into `src/routes/admin/_gated/`.
+2. Rename `_admin/route.tsx` → `admin/_gated/route.tsx` and update its `createFileRoute("/_admin")` string to `createFileRoute("/admin/_gated")`. Logic (auth check + `AdminSidebar` + `<Outlet />`) stays the same.
+3. Update every child route's `createFileRoute("/_admin/<name>")` string to `createFileRoute("/admin/_gated/<name>")` (the `_gated` segment is pathless, so URLs become `/admin/<name>`).
+4. Delete the now-empty `src/routes/_admin/` folder.
+5. Sidebar `to="/admin/dashboard"` links and `navigate({ to: "/admin/dashboard" })` in `admin.login.tsx` will now resolve correctly — no changes needed there.
 
-**Nav:** Home · Categories dropdown · Wishlist · Cart · Account.
+## Why `_gated` (nested pathless) rather than renaming `_admin` → `admin`
 
-## Phase 2 — next session (admin CRUD)
-- Admin: add/edit/delete categories, brands, products
-- Multi-image upload via Supabase Storage (`product-images` bucket)
-- Inventory management (stock)
-- Orders table view + status updates (pending/paid/shipped/delivered)
-- User management (view all, delete)
+A flat `admin/route.tsx` layout would also apply its auth gate to `admin/login.tsx`, causing a redirect loop on the login page itself. Nesting the gate under `admin/_gated/` keeps `/admin/login` public while giving every other admin page the `/admin/` prefix.
 
-## Phase 3 — next session (premium redesign + customer dashboard)
-- Full luxe homepage: hero video/carousel, featured collections, new arrivals, best sellers, testimonials, newsletter, Instagram gallery, premium footer
-- Feminine palette refinement (blush/champagne accents on the orange)
-- Customer dashboard: order history, tracking, addresses, profile
-- Animations, skeleton loaders, empty states polish
+## Out of scope
 
----
-
-**Technical notes**
-- Server fns in `src/lib/*.functions.ts` with `.handler()`-scoped `supabaseAdmin` imports (never top-level, per import-graph rules).
-- Public catalog reads use publishable-key server client + `TO anon` policies — no admin-key reads.
-- All ₦ formatting via `Intl.NumberFormat('en-NG', { currency: 'NGN' })`.
-- Storage bucket for product images created in Phase 2.
-
-**Ready?** Reply "go" and I'll ship Phase 1 (migration first for your approval, then all the code).
+This plan only fixes the routing 404. Building the new Products management page and the storage bucket for image uploads remains as the previously proposed follow-up.

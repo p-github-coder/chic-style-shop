@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { listApplications, approveApplication, rejectApplication } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_admin/applications")({
+export const Route = createFileRoute("/admin/_gated/applications")({
   component: ApplicationsPage,
 });
 

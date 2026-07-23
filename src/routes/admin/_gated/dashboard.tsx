@@ -5,7 +5,7 @@ import { Users, ShoppingCart, Clock, Package, AlertTriangle, DollarSign, Trendin
 import { getAdminMetrics } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
 
-export const Route = createFileRoute("/_admin/dashboard")({
+export const Route = createFileRoute("/admin/_gated/dashboard")({
   component: DashboardPage,
 });
 
