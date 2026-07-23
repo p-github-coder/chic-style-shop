@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { listUsers, setUserStatus, deleteUser } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
 
-export const Route = createFileRoute("/_admin/users")({
+export const Route = createFileRoute("/admin/_gated/users")({
   component: UsersPage,
 });
 

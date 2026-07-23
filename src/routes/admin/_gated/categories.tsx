@@ -11,7 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { upsertCategory, deleteCategory, upsertSubcategory, deleteSubcategory } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_admin/categories")({
+export const Route = createFileRoute("/admin/_gated/categories")({
   component: CategoriesPage,
 });
 

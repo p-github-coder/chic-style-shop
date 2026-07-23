@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { listOrders, updateOrderStatus, getOrderDetails } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
 
-export const Route = createFileRoute("/_admin/orders")({
+export const Route = createFileRoute("/admin/_gated/orders")({
   component: OrdersPage,
 });
 

@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { upsertBrand, deleteBrand } from "@/lib/admin.functions";
 
-export const Route = createFileRoute("/_admin/brands")({
+export const Route = createFileRoute("/admin/_gated/brands")({
   component: BrandsPage,
 });
 
