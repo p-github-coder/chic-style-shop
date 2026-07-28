@@ -23,18 +23,26 @@ function DashboardPage() {
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "metrics"],
     queryFn: () => fetchMetrics({}),
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
+    refetchOnMount: "always",
   });
 
   const cards = [
     { label: "Revenue", value: formatNaira(data?.revenue ?? 0), icon: DollarSign, color: "text-emerald-600" },
     { label: "Total Orders", value: data?.totalOrders ?? 0, icon: ShoppingCart, color: "text-primary" },
-    { label: "Customers", value: data?.approvedCustomers ?? 0, icon: Users, color: "text-primary" },
+    { label: "Total Customers", value: data?.approvedCustomers ?? 0, icon: Users, color: "text-primary" },
     { label: "Pending Registrations", value: data?.pending ?? 0, icon: Clock, color: "text-amber-600" },
+    { label: "Approved Registrations", value: data?.approved ?? 0, icon: Users, color: "text-emerald-600" },
+    { label: "Rejected Registrations", value: data?.rejected ?? 0, icon: Clock, color: "text-rose-600" },
     { label: "Total Products", value: data?.totalProducts ?? 0, icon: Package, color: "text-primary" },
-    { label: "Out of Stock", value: data?.outOfStock ?? 0, icon: AlertTriangle, color: "text-destructive" },
+    { label: "In Stock", value: data?.inStock ?? 0, icon: Package, color: "text-emerald-600" },
     { label: "Low Stock", value: data?.lowStock ?? 0, icon: TrendingUp, color: "text-amber-600" },
+    { label: "Out of Stock", value: data?.outOfStock ?? 0, icon: AlertTriangle, color: "text-destructive" },
+    { label: "Suspended", value: data?.suspendedCustomers ?? 0, icon: Users, color: "text-slate-600" },
     { label: "Delivered", value: data?.byStatus?.delivered ?? 0, icon: ShoppingCart, color: "text-emerald-600" },
   ];
+
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
