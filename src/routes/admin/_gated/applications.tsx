@@ -31,6 +31,7 @@ function ApplicationsPage() {
   const fetchApps = useServerFn(listApplications);
   const approveFn = useServerFn(approveApplication);
   const rejectFn = useServerFn(rejectApplication);
+  const deleteFn = useServerFn(deleteApplication);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
 
   const { data: applications = [], isLoading } = useQuery({
