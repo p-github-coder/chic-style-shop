@@ -7,8 +7,19 @@ export const Route = createFileRoute("/_authenticated")({
   beforeLoad: async () => {
     const { data, error } = await supabase.auth.getUser();
     if (error || !data.user) throw redirect({ to: "/login" });
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("status")
+      .eq("id", data.user.id)
+      .maybeSingle();
+    // Only approved customers may use cart/checkout features.
+    if (profile && profile.status !== "approved") {
+      await supabase.auth.signOut();
+      throw redirect({ to: "/login" });
+    }
     return { user: data.user };
   },
+
   component: AuthLayout,
 });
 
