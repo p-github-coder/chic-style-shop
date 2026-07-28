@@ -29,6 +29,7 @@ import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/d
 import { Route as AdminGatedCategoriesRouteImport } from './routes/admin/_gated/categories'
 import { Route as AdminGatedBrandsRouteImport } from './routes/admin/_gated/brands'
 import { Route as AdminGatedApplicationsRouteImport } from './routes/admin/_gated/applications'
+import { Route as AdminGatedActivityRouteImport } from './routes/admin/_gated/activity'
 
 const WishlistRoute = WishlistRouteImport.update({
   id: '/wishlist',
@@ -129,6 +130,11 @@ const AdminGatedApplicationsRoute = AdminGatedApplicationsRouteImport.update({
   path: '/applications',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedActivityRoute = AdminGatedActivityRouteImport.update({
+  id: '/activity',
+  path: '/activity',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/admin/login': typeof AdminLoginRoute
   '/category/$category': typeof CategoryCategoryRouteWithChildren
   '/product/$slug': typeof ProductSlugRoute
+  '/admin/activity': typeof AdminGatedActivityRoute
   '/admin/applications': typeof AdminGatedApplicationsRoute
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
@@ -163,6 +170,7 @@ export interface FileRoutesByTo {
   '/admin/login': typeof AdminLoginRoute
   '/category/$category': typeof CategoryCategoryRouteWithChildren
   '/product/$slug': typeof ProductSlugRoute
+  '/admin/activity': typeof AdminGatedActivityRoute
   '/admin/applications': typeof AdminGatedApplicationsRoute
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
@@ -186,6 +194,7 @@ export interface FileRoutesById {
   '/admin/login': typeof AdminLoginRoute
   '/category/$category': typeof CategoryCategoryRouteWithChildren
   '/product/$slug': typeof ProductSlugRoute
+  '/admin/_gated/activity': typeof AdminGatedActivityRoute
   '/admin/_gated/applications': typeof AdminGatedApplicationsRoute
   '/admin/_gated/brands': typeof AdminGatedBrandsRoute
   '/admin/_gated/categories': typeof AdminGatedCategoriesRoute
@@ -209,6 +218,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/category/$category'
     | '/product/$slug'
+    | '/admin/activity'
     | '/admin/applications'
     | '/admin/brands'
     | '/admin/categories'
@@ -230,6 +240,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/category/$category'
     | '/product/$slug'
+    | '/admin/activity'
     | '/admin/applications'
     | '/admin/brands'
     | '/admin/categories'
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/admin/login'
     | '/category/$category'
     | '/product/$slug'
+    | '/admin/_gated/activity'
     | '/admin/_gated/applications'
     | '/admin/_gated/brands'
     | '/admin/_gated/categories'
@@ -417,6 +429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedApplicationsRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/activity': {
+      id: '/admin/_gated/activity'
+      path: '/activity'
+      fullPath: '/admin/activity'
+      preLoaderRoute: typeof AdminGatedActivityRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
   }
 }
 
@@ -434,6 +453,7 @@ const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 interface AdminGatedRouteRouteChildren {
+  AdminGatedActivityRoute: typeof AdminGatedActivityRoute
   AdminGatedApplicationsRoute: typeof AdminGatedApplicationsRoute
   AdminGatedBrandsRoute: typeof AdminGatedBrandsRoute
   AdminGatedCategoriesRoute: typeof AdminGatedCategoriesRoute
@@ -444,6 +464,7 @@ interface AdminGatedRouteRouteChildren {
 }
 
 const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
+  AdminGatedActivityRoute: AdminGatedActivityRoute,
   AdminGatedApplicationsRoute: AdminGatedApplicationsRoute,
   AdminGatedBrandsRoute: AdminGatedBrandsRoute,
   AdminGatedCategoriesRoute: AdminGatedCategoriesRoute,
