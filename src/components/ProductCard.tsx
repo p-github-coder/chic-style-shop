@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { formatNaira } from "@/lib/format";
+import { useAuthUser } from "@/hooks/useAuthUser";
 
 export type Product = {
   id: string;
@@ -23,16 +24,18 @@ export function ProductCard({ product }: { product: Product }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
 
+  const { data: authUser } = useAuthUser();
+
   const { data: wished } = useQuery({
-    queryKey: ["wishlist-has", product.id],
+    // keyed per user so one customer never sees another customer's saves
+    queryKey: ["wishlist-has", authUser?.id ?? "anon", product.id],
+    enabled: !!authUser?.id,
     queryFn: async () => {
-      const { data: u } = await supabase.auth.getUser();
-      if (!u.user) return false;
       const { data } = await supabase
         .from("wishlist_items")
         .select("id")
         .eq("product_id", product.id)
-        .eq("user_id", u.user.id)
+        .eq("user_id", authUser!.id)
         .maybeSingle();
       return !!data;
     },
@@ -96,7 +99,7 @@ export function ProductCard({ product }: { product: Product }) {
       }
     },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["wishlist-has", product.id] });
+      qc.invalidateQueries({ queryKey: ["wishlist-has", authUser?.id ?? "anon", product.id] });
       qc.invalidateQueries({ queryKey: ["wishlist"] });
     },
   });

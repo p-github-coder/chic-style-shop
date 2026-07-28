@@ -1,8 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
 import { Heart, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { Navbar } from "@/components/Navbar";
 import { ProductCard, type Product } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
@@ -13,18 +13,17 @@ export const Route = createFileRoute("/wishlist")({
 });
 
 function WishlistPage() {
-  const [signedIn, setSignedIn] = useState<boolean | null>(null);
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setSignedIn(!!data.user));
-  }, []);
+  const { data: authUser, isLoading: authLoading } = useAuthUser();
+  const signedIn = authLoading ? null : !!authUser;
 
   const { data: items = [], isLoading } = useQuery({
-    queryKey: ["wishlist"],
-    enabled: !!signedIn,
+    queryKey: ["wishlist", authUser?.id ?? "anon"],
+    enabled: !!authUser?.id,
     queryFn: async () => {
       const { data, error } = await supabase
         .from("wishlist_items")
         .select("product_id, products(id, slug, name, description, price, image_url, images, rating, brands(name, slug))")
+        .eq("user_id", authUser!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       return (data ?? []).map((r) => r.products).filter(Boolean) as unknown as Product[];
