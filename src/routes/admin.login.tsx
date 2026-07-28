@@ -75,16 +75,18 @@ function AdminLoginPage() {
           <p className="text-muted-foreground mt-1">Restricted area — administrators only.</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-card border border-border rounded-3xl p-8 space-y-4">
+        <form onSubmit={handleSubmit} autoComplete="off" className="bg-card border border-border rounded-3xl p-8 space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" required value={email}
+            <Label htmlFor="admin-email">Email</Label>
+            <Input id="admin-email" name="admin-email" type="email" required value={email}
+              autoComplete="off" autoCorrect="off" spellCheck={false}
               onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="admin-password">Password</Label>
             <div className="relative">
-              <Input id="password" type={showPw ? "text" : "password"} required
+              <Input id="admin-password" name="admin-password" type={showPw ? "text" : "password"} required
+                autoComplete="new-password"
                 value={password} onChange={(e) => setPassword(e.target.value)} />
               <button type="button" onClick={() => setShowPw((s) => !s)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
