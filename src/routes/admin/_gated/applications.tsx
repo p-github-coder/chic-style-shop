@@ -57,6 +57,15 @@ function ApplicationsPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { applicationId: id } }),
+    onSuccess: () => {
+      toast.success("Application deleted");
+      qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   const filtered = applications.filter((a) => filter === "all" || a.status === filter);
 
