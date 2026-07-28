@@ -152,6 +152,11 @@ function ApplicationsPage() {
                           <X className="h-3.5 w-3.5 mr-1" /> Reject
                         </Button>
                       )}
+                      <Button size="sm" variant="destructive" className="rounded-full"
+                        disabled={remove.isPending}
+                        onClick={() => { if (confirm(`Delete application for ${app.email}?`)) remove.mutate(app.id); }}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </td>
                 </tr>
