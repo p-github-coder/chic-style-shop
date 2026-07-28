@@ -75,12 +75,12 @@ function ProductsPage() {
 
   const save = useMutation({
     mutationFn: (v: any) => upsert({ data: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "products"] }); setEditing(null); toast.success("Product saved"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "products"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); setEditing(null); toast.success("Product saved"); },
     onError: (e: Error) => toast.error(e.message),
   });
   const remove = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "products"] }); toast.success("Deleted"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "products"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); toast.success("Deleted"); },
     onError: (e: Error) => toast.error(e.message),
   });
 
