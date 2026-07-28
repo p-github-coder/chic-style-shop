@@ -99,6 +99,20 @@ export const rejectApplication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const deleteApplication = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { applicationId: string }) => data)
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin
+      .from("registration_applications")
+      .delete()
+      .eq("id", data.applicationId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
 // -------- Dashboard metrics --------
 export const getAdminMetrics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])

@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Check, X, Loader2, Clock, CheckCircle2, XCircle } from "lucide-react";
+import { Check, X, Loader2, Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { listApplications, approveApplication, rejectApplication } from "@/lib/admin.functions";
+import { listApplications, approveApplication, rejectApplication, deleteApplication } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/_gated/applications")({
   component: ApplicationsPage,
@@ -31,6 +31,7 @@ function ApplicationsPage() {
   const fetchApps = useServerFn(listApplications);
   const approveFn = useServerFn(approveApplication);
   const rejectFn = useServerFn(rejectApplication);
+  const deleteFn = useServerFn(deleteApplication);
   const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
 
   const { data: applications = [], isLoading } = useQuery({
@@ -56,6 +57,15 @@ function ApplicationsPage() {
     },
     onError: (e: Error) => toast.error(e.message),
   });
+  const remove = useMutation({
+    mutationFn: (id: string) => deleteFn({ data: { applicationId: id } }),
+    onSuccess: () => {
+      toast.success("Application deleted");
+      qc.invalidateQueries({ queryKey: ["admin"] });
+    },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
 
   const filtered = applications.filter((a) => filter === "all" || a.status === filter);
 
@@ -142,6 +152,11 @@ function ApplicationsPage() {
                           <X className="h-3.5 w-3.5 mr-1" /> Reject
                         </Button>
                       )}
+                      <Button size="sm" variant="destructive" className="rounded-full"
+                        disabled={remove.isPending}
+                        onClick={() => { if (confirm(`Delete application for ${app.email}?`)) remove.mutate(app.id); }}>
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </Button>
                     </div>
                   </td>
                 </tr>
