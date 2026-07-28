@@ -211,14 +211,18 @@ export const listUsers = createServerFn({ method: "GET" })
     for (const c of (cartRes.data ?? []) as { user_id: string; quantity: number }[]) {
       cartCounts.set(c.user_id, (cartCounts.get(c.user_id) ?? 0) + Number(c.quantity));
     }
-    return (profilesRes.data ?? []).map((p: any) => ({
-      ...p,
-      roles: roles.get(p.id) ?? [],
-      orderCount: orderStats.get(p.id)?.count ?? 0,
-      orderTotal: orderStats.get(p.id)?.total ?? 0,
-      wishlistCount: wishCounts.get(p.id) ?? 0,
-      cartCount: cartCounts.get(p.id) ?? 0,
-    }));
+    return (profilesRes.data ?? [])
+      // Customers page lists shoppers only — admin accounts are hidden.
+      .filter((p: any) => !(roles.get(p.id) ?? []).includes("admin"))
+      .map((p: any) => ({
+        ...p,
+        roles: roles.get(p.id) ?? [],
+        orderCount: orderStats.get(p.id)?.count ?? 0,
+        orderTotal: orderStats.get(p.id)?.total ?? 0,
+        wishlistCount: wishCounts.get(p.id) ?? 0,
+        cartCount: cartCounts.get(p.id) ?? 0,
+      }));
+
   });
 
 // -------- Customer activity (wishlist + cart) --------
