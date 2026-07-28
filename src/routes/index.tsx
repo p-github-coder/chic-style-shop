@@ -256,6 +256,10 @@ function LandingPage() {
           </div>
           <div className="border-t border-border py-6 text-center text-xs text-muted-foreground">
             © {new Date().getFullYear()} MaisonFemme. All rights reserved.
+            <span className="mx-2">·</span>
+            <Link to="/admin/login" className="hover:text-foreground underline-offset-2 hover:underline">
+              Admin
+            </Link>
           </div>
         </footer>
       </main>
