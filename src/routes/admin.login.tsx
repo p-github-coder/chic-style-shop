@@ -17,8 +17,8 @@ export const Route = createFileRoute("/admin/login")({
 function AdminLoginPage() {
   const navigate = useNavigate();
   const boot = useServerFn(bootstrapAdmin);
-  const [email, setEmail] = useState("uzlivinus@gmail.com");
-  const [password, setPassword] = useState("uzlivinus565");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
