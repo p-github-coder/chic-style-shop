@@ -38,7 +38,7 @@ function OrdersPage() {
 
   const mut = useMutation({
     mutationFn: (v: { orderId: string; status: string }) => update({ data: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "orders"] }); toast.success("Status updated"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "orders"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); toast.success("Status updated"); },
     onError: (e: Error) => toast.error(e.message),
   });
 

@@ -22,6 +22,7 @@ function BrandPage() {
   const [sort, setSort] = useState<Sort>("featured");
   const [maxPrice, setMaxPrice] = useState<number>(20_000_000);
   const [showFilters, setShowFilters] = useState(false);
+  const [subId, setSubId] = useState<string | null>(null);
 
   const { data: ctx, isLoading } = useQuery({
     queryKey: ["brand-ctx", catSlug, brandSlug],
@@ -49,16 +50,31 @@ function BrandPage() {
     queryFn: async () => {
       const { data, error } = await supabase
         .from("products")
-        .select("id, slug, name, description, price, image_url, images, rating, created_at, featured, brands(name, slug)")
+        .select("id, slug, name, description, price, image_url, images, rating, created_at, featured, subcategory_id, brands(name, slug)")
         .eq("brand_id", ctx!.brand.id);
       if (error) throw error;
-      return data as unknown as (Product & { created_at: string; featured: boolean })[];
+      return data as unknown as (Product & { created_at: string; featured: boolean; subcategory_id: string | null })[];
+    },
+  });
+
+  const { data: subs = [] } = useQuery({
+    queryKey: ["subcategories", ctx?.category.id],
+    enabled: !!ctx?.category.id,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("subcategories")
+        .select("id, slug, name")
+        .eq("category_id", ctx!.category.id)
+        .order("sort_order");
+      if (error) throw error;
+      return data;
     },
   });
 
   const filtered = useMemo(() => {
     let list = products.filter(
       (p) =>
+        (subId === null || p.subcategory_id === subId) &&
         Number(p.price) <= maxPrice &&
         (search === "" ||
           p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -81,7 +97,7 @@ function BrandPage() {
         list = [...list].sort((a, b) => (a.featured === b.featured ? 0 : a.featured ? -1 : 1));
     }
     return list;
-  }, [products, search, sort, maxPrice]);
+  }, [products, search, sort, maxPrice, subId]);
 
   if (isLoading || !ctx) {
     return (
@@ -112,6 +128,30 @@ function BrandPage() {
           <p className="mt-2 text-muted-foreground">
             All {ctx.brand.name} {ctx.category.name.toLowerCase()}.
           </p>
+
+          {subs.length > 0 && (
+            <div className="mt-6 flex flex-wrap gap-2">
+              <button
+                onClick={() => setSubId(null)}
+                className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+                  subId === null ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
+                }`}
+              >
+                All types
+              </button>
+              {subs.map((s) => (
+                <button
+                  key={s.id}
+                  onClick={() => setSubId(subId === s.id ? null : s.id)}
+                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
+                    subId === s.id ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
+                  }`}
+                >
+                  {s.name}
+                </button>
+              ))}
+            </div>
+          )}
 
           <div className="mt-6 flex flex-col sm:flex-row gap-3">
             <div className="relative flex-1">

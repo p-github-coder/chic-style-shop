@@ -27,7 +27,11 @@ function LoginPage() {
     const { data: signIn, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setLoading(false);
-      toast.error(error.message);
+      if (/confirm/i.test(error.message)) {
+        toast.error("Your account is still awaiting admin approval. You'll be able to sign in once it's approved.");
+      } else {
+        toast.error(error.message);
+      }
       return;
     }
 
@@ -48,6 +52,12 @@ function LoginPage() {
       await supabase.auth.signOut();
       setLoading(false);
       toast.error("Your application was not approved.");
+      return;
+    }
+    if (profile?.status === "suspended") {
+      await supabase.auth.signOut();
+      setLoading(false);
+      toast.error("Your account has been suspended. Please contact support.");
       return;
     }
 

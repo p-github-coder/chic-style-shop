@@ -39,22 +39,22 @@ function CategoriesPage() {
 
   const save = useMutation({
     mutationFn: (v: any) => upsert({ data: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "categories"] }); qc.invalidateQueries({ queryKey: ["categories"] }); setEditing(null); toast.success("Saved"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "categories"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); qc.invalidateQueries({ queryKey: ["categories"] }); setEditing(null); toast.success("Saved"); },
     onError: (e: Error) => toast.error(e.message),
   });
   const remove = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "categories"] }); toast.success("Deleted"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "categories"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); toast.success("Deleted"); },
     onError: (e: Error) => toast.error(e.message),
   });
   const saveSub = useMutation({
     mutationFn: (v: any) => upsertSub({ data: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "subcategories"] }); setSubEditing(null); toast.success("Saved"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "subcategories"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); setSubEditing(null); toast.success("Saved"); },
     onError: (e: Error) => toast.error(e.message),
   });
   const removeSub = useMutation({
     mutationFn: (id: string) => delSub({ data: { id } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "subcategories"] }); toast.success("Deleted"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "subcategories"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); toast.success("Deleted"); },
     onError: (e: Error) => toast.error(e.message),
   });
 

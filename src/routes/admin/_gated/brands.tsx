@@ -35,12 +35,12 @@ function BrandsPage() {
 
   const save = useMutation({
     mutationFn: (v: any) => upsert({ data: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "brands"] }); setEditing(null); toast.success("Saved"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "brands"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); setEditing(null); toast.success("Saved"); },
     onError: (e: Error) => toast.error(e.message),
   });
   const remove = useMutation({
     mutationFn: (id: string) => del({ data: { id } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "brands"] }); toast.success("Deleted"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["admin", "brands"] }); qc.invalidateQueries({ queryKey: ["admin", "metrics"] }); toast.success("Deleted"); },
     onError: (e: Error) => toast.error(e.message),
   });
 

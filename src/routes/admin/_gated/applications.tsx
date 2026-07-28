@@ -2,14 +2,22 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
-import { Check, X, Loader2, Clock, CheckCircle2, XCircle, Trash2 } from "lucide-react";
+import { Check, X, Loader2, Clock, CheckCircle2, XCircle, Trash2, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { listApplications, approveApplication, rejectApplication, deleteApplication } from "@/lib/admin.functions";
+import {
+  listApplications,
+  approveApplication,
+  rejectApplication,
+  suspendApplication,
+  deleteApplication,
+} from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/_gated/applications")({
   component: ApplicationsPage,
 });
+
+type Status = "pending" | "approved" | "rejected" | "suspended";
 
 type Application = {
   id: string;
@@ -21,9 +29,16 @@ type Application = {
   state: string | null;
   city: string | null;
   requested_role: "admin" | "customer" | "seller";
-  status: "pending" | "approved" | "rejected";
+  status: Status;
   rejection_reason: string | null;
   created_at: string;
+};
+
+const BADGES: Record<Status, { icon: typeof Clock; cls: string; label: string }> = {
+  pending: { icon: Clock, cls: "bg-amber-100 text-amber-800", label: "Pending" },
+  approved: { icon: CheckCircle2, cls: "bg-emerald-100 text-emerald-800", label: "Approved" },
+  rejected: { icon: XCircle, cls: "bg-red-100 text-red-800", label: "Rejected" },
+  suspended: { icon: Ban, cls: "bg-slate-200 text-slate-800", label: "Suspended" },
 };
 
 function ApplicationsPage() {
@@ -31,50 +46,46 @@ function ApplicationsPage() {
   const fetchApps = useServerFn(listApplications);
   const approveFn = useServerFn(approveApplication);
   const rejectFn = useServerFn(rejectApplication);
+  const suspendFn = useServerFn(suspendApplication);
   const deleteFn = useServerFn(deleteApplication);
-  const [filter, setFilter] = useState<"all" | "pending" | "approved" | "rejected">("pending");
+  const [filter, setFilter] = useState<"all" | Status>("pending");
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ["admin", "applications"],
     queryFn: () => fetchApps({}) as Promise<Application[]>,
   });
 
+  const refresh = () => qc.invalidateQueries({ queryKey: ["admin"] });
+
   const approve = useMutation({
     mutationFn: (id: string) => approveFn({ data: { applicationId: id } }),
-    onSuccess: () => {
-      toast.success("Application approved");
-      qc.invalidateQueries({ queryKey: ["admin"] });
-    },
+    onSuccess: () => { toast.success("Approved — the customer can now sign in"); refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
   const reject = useMutation({
-    mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-      rejectFn({ data: { applicationId: id, reason } }),
-    onSuccess: () => {
-      toast.success("Application rejected");
-      qc.invalidateQueries({ queryKey: ["admin"] });
-    },
+    mutationFn: ({ id, reason }: { id: string; reason: string }) => rejectFn({ data: { applicationId: id, reason } }),
+    onSuccess: () => { toast.success("Application rejected"); refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
+
+  const suspend = useMutation({
+    mutationFn: (id: string) => suspendFn({ data: { applicationId: id } }),
+    onSuccess: () => { toast.success("Account suspended"); refresh(); },
+    onError: (e: Error) => toast.error(e.message),
+  });
+
   const remove = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { applicationId: id } }),
-    onSuccess: () => {
-      toast.success("Application deleted");
-      qc.invalidateQueries({ queryKey: ["admin"] });
-    },
+    onSuccess: () => { toast.success("Application deleted"); refresh(); },
     onError: (e: Error) => toast.error(e.message),
   });
 
-
+  const counts = (s: Status) => applications.filter((a) => a.status === s).length;
   const filtered = applications.filter((a) => filter === "all" || a.status === filter);
 
-  const badge = (status: Application["status"]) => {
-    const map = {
-      pending: { icon: Clock, cls: "bg-amber-100 text-amber-800", label: "Pending" },
-      approved: { icon: CheckCircle2, cls: "bg-emerald-100 text-emerald-800", label: "Approved" },
-      rejected: { icon: XCircle, cls: "bg-red-100 text-red-800", label: "Rejected" },
-    }[status];
+  const badge = (status: Status) => {
+    const map = BADGES[status] ?? BADGES.pending;
     return (
       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${map.cls}`}>
         <map.icon className="h-3 w-3" /> {map.label}
@@ -86,16 +97,19 @@ function ApplicationsPage() {
     <div className="p-8 max-w-7xl mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-display font-extrabold">Registration applications</h1>
-        <p className="text-muted-foreground mt-1">Approve or reject customer and seller sign-ups.</p>
+        <p className="text-muted-foreground mt-1">
+          Approve, reject, suspend or delete customer accounts. Approved customers appear under Customers.
+        </p>
       </div>
 
-      <div className="mb-4 flex gap-2">
-        {(["pending", "approved", "rejected", "all"] as const).map((f) => (
+      <div className="mb-4 flex gap-2 flex-wrap">
+        {(["pending", "approved", "rejected", "suspended", "all"] as const).map((f) => (
           <button key={f} onClick={() => setFilter(f)}
             className={`px-4 py-2 rounded-full text-sm font-medium capitalize transition-colors ${
               filter === f ? "bg-primary text-primary-foreground" : "bg-card border border-border hover:bg-accent"
             }`}>
             {f}
+            {f !== "all" && <span className="ml-1.5 opacity-70">{counts(f)}</span>}
           </button>
         ))}
       </div>
@@ -106,63 +120,70 @@ function ApplicationsPage() {
         ) : filtered.length === 0 ? (
           <div className="p-12 text-center text-muted-foreground">No applications in this view.</div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="bg-muted/50">
-              <tr className="text-left">
-                <th className="px-4 py-3 font-medium">Name</th>
-                <th className="px-4 py-3 font-medium">Email</th>
-                <th className="px-4 py-3 font-medium">Phone</th>
-                <th className="px-4 py-3 font-medium">Age</th>
-                <th className="px-4 py-3 font-medium">Location</th>
-                <th className="px-4 py-3 font-medium">Status</th>
-                <th className="px-4 py-3 font-medium">Date</th>
-                <th className="px-4 py-3 font-medium text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((app) => (
-                <tr key={app.id} className="border-t border-border">
-                  <td className="px-4 py-3">
-                    <div className="font-medium">{app.full_name || "—"}</div>
-                    {app.username && <div className="text-xs text-muted-foreground">@{app.username}</div>}
-                  </td>
-                  <td className="px-4 py-3 text-muted-foreground">{app.email}</td>
-                  <td className="px-4 py-3 text-xs">{app.phone || "—"}</td>
-                  <td className="px-4 py-3 text-xs">{app.age ?? "—"}</td>
-                  <td className="px-4 py-3 text-xs">{[app.city, app.state].filter(Boolean).join(", ") || "—"}</td>
-                  <td className="px-4 py-3">{badge(app.status)}</td>
-                  <td className="px-4 py-3 text-muted-foreground">
-                    {new Date(app.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex gap-2 justify-end">
-                      {app.status !== "approved" && (
-                        <Button size="sm" onClick={() => approve.mutate(app.id)}
-                          disabled={approve.isPending} className="rounded-full">
-                          <Check className="h-3.5 w-3.5 mr-1" /> Approve
-                        </Button>
-                      )}
-                      {app.status !== "rejected" && (
-                        <Button size="sm" variant="outline"
-                          onClick={() => {
-                            const reason = window.prompt("Rejection reason (optional):") ?? "";
-                            reject.mutate({ id: app.id, reason });
-                          }}
-                          disabled={reject.isPending} className="rounded-full">
-                          <X className="h-3.5 w-3.5 mr-1" /> Reject
-                        </Button>
-                      )}
-                      <Button size="sm" variant="destructive" className="rounded-full"
-                        disabled={remove.isPending}
-                        onClick={() => { if (confirm(`Delete application for ${app.email}?`)) remove.mutate(app.id); }}>
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </Button>
-                    </div>
-                  </td>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-muted/50">
+                <tr className="text-left">
+                  <th className="px-4 py-3 font-medium">Name</th>
+                  <th className="px-4 py-3 font-medium">Email</th>
+                  <th className="px-4 py-3 font-medium">Phone</th>
+                  <th className="px-4 py-3 font-medium">Age</th>
+                  <th className="px-4 py-3 font-medium">Location</th>
+                  <th className="px-4 py-3 font-medium">Status</th>
+                  <th className="px-4 py-3 font-medium">Date</th>
+                  <th className="px-4 py-3 font-medium text-right">Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {filtered.map((app) => (
+                  <tr key={app.id} className="border-t border-border">
+                    <td className="px-4 py-3">
+                      <div className="font-medium">{app.full_name || "—"}</div>
+                      {app.username && <div className="text-xs text-muted-foreground">@{app.username}</div>}
+                    </td>
+                    <td className="px-4 py-3 text-muted-foreground">{app.email}</td>
+                    <td className="px-4 py-3 text-xs">{app.phone || "—"}</td>
+                    <td className="px-4 py-3 text-xs">{app.age ?? "—"}</td>
+                    <td className="px-4 py-3 text-xs">{[app.city, app.state].filter(Boolean).join(", ") || "—"}</td>
+                    <td className="px-4 py-3">{badge(app.status)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{new Date(app.created_at).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">
+                      <div className="flex gap-2 justify-end flex-wrap">
+                        {app.status !== "approved" && (
+                          <Button size="sm" onClick={() => approve.mutate(app.id)}
+                            disabled={approve.isPending} className="rounded-full">
+                            <Check className="h-3.5 w-3.5 mr-1" /> Approve
+                          </Button>
+                        )}
+                        {app.status !== "rejected" && (
+                          <Button size="sm" variant="outline"
+                            onClick={() => {
+                              const reason = window.prompt("Rejection reason (optional):") ?? "";
+                              reject.mutate({ id: app.id, reason });
+                            }}
+                            disabled={reject.isPending} className="rounded-full">
+                            <X className="h-3.5 w-3.5 mr-1" /> Reject
+                          </Button>
+                        )}
+                        {app.status !== "suspended" && (
+                          <Button size="sm" variant="outline" className="rounded-full"
+                            disabled={suspend.isPending}
+                            onClick={() => { if (confirm(`Suspend ${app.email}?`)) suspend.mutate(app.id); }}>
+                            <Ban className="h-3.5 w-3.5 mr-1" /> Suspend
+                          </Button>
+                        )}
+                        <Button size="sm" variant="destructive" className="rounded-full"
+                          disabled={remove.isPending}
+                          onClick={() => { if (confirm(`Delete application for ${app.email}?`)) remove.mutate(app.id); }}>
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

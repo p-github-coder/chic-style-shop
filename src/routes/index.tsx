@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Sparkles, Truck, ShieldCheck, Gem } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
+import { useAuthUser } from "@/hooks/useAuthUser";
 import { ProductCard, type Product } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 
@@ -35,6 +36,9 @@ type Category = {
 };
 
 function LandingPage() {
+  const { data: authUser } = useAuthUser();
+  const firstName = (authUser?.full_name || authUser?.email || "").split(" ")[0].split("@")[0];
+
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
@@ -79,6 +83,24 @@ function LandingPage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main className="pt-16">
+        {authUser && authUser.status === "approved" && (
+          <section className="bg-accent border-b border-border">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="font-display font-semibold text-lg">
+                Welcome, <span className="text-primary capitalize">{firstName}</span> 👋
+              </p>
+              <div className="flex gap-2">
+                <Button asChild size="sm" variant="outline" className="rounded-full">
+                  <Link to="/wishlist">My wishlist</Link>
+                </Button>
+                <Button asChild size="sm" className="rounded-full">
+                  <Link to="/cart">My cart</Link>
+                </Button>
+              </div>
+            </div>
+          </section>
+        )}
+
         {/* Hero */}
         <section className="relative overflow-hidden" style={{ background: "var(--gradient-primary)" }}>
           <div className="absolute inset-0 opacity-30 mix-blend-overlay bg-[url('https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600')] bg-cover bg-center" />
