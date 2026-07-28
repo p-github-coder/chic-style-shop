@@ -80,6 +80,14 @@ export const approveApplication = createServerFn({ method: "POST" })
 
     await supabaseAdmin.from("profiles").update({ status: "approved" }).eq("id", app.user_id);
     await supabaseAdmin.from("user_roles").upsert({ user_id: app.user_id, role: app.requested_role }, { onConflict: "user_id,role" });
+
+    // Fully activate the account: confirm the email so the customer can sign in immediately.
+    const { error: confirmErr } = await supabaseAdmin.auth.admin.updateUserById(app.user_id, {
+      email_confirm: true,
+      ban_duration: "none",
+    });
+    if (confirmErr) throw new Error(confirmErr.message);
+
     return { ok: true };
   });
 
@@ -99,6 +107,25 @@ export const rejectApplication = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
+export const suspendApplication = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: { applicationId: string }) => data)
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: app, error: fetchErr } = await supabaseAdmin
+      .from("registration_applications").select("user_id").eq("id", data.applicationId).single();
+    if (fetchErr) throw new Error(fetchErr.message);
+    if (app.user_id === context.userId) throw new Error("You cannot suspend yourself");
+
+    const { error: updErr } = await supabaseAdmin.from("registration_applications").update({
+      status: "suspended", reviewed_by: context.userId, reviewed_at: new Date().toISOString(),
+    }).eq("id", data.applicationId);
+    if (updErr) throw new Error(updErr.message);
+    await supabaseAdmin.from("profiles").update({ status: "suspended" }).eq("id", app.user_id);
+    return { ok: true };
+  });
+
 export const deleteApplication = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((data: { applicationId: string }) => data)
@@ -112,6 +139,7 @@ export const deleteApplication = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
 
 // -------- Dashboard metrics --------
 export const getAdminMetrics = createServerFn({ method: "GET" })
