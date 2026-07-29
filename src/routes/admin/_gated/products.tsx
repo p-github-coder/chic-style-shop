@@ -51,6 +51,10 @@ function ProductsPage() {
   const [catFilter, setCatFilter] = useState<string>("all");
   const [stockFilter, setStockFilter] = useState<"all" | "in" | "low" | "out">("all");
 
+  // Inventory edits from any admin session show up immediately.
+  useRealtimeSync(["products"], [["admin", "products"], ["admin", "metrics"]]);
+
+
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["admin", "products"],
     queryFn: async () => {
