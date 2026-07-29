@@ -1,6 +1,6 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { Loader2, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
@@ -8,20 +8,30 @@ import { ProductCard, type Product } from "@/components/ProductCard";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/category/$category")({
-  ssr: false,
-  component: CategoryPage,
-});
-
 type Sort = "featured" | "newest" | "price-asc" | "price-desc" | "rating";
 type Row = Product & { created_at: string; featured: boolean; brand_id: string | null; subcategory_id: string | null };
 
+export const Route = createFileRoute("/category/$category")({
+  ssr: false,
+  // Filters live in the URL so they survive refresh and can be shared.
+  validateSearch: (search: Record<string, unknown>) => ({
+    brand: typeof search.brand === "string" ? search.brand : "",
+    type: typeof search.type === "string" ? search.type : "",
+    q: typeof search.q === "string" ? search.q : "",
+    sort: typeof search.sort === "string" ? (search.sort as Sort) : ("featured" as Sort),
+  }),
+  component: CategoryPage,
+});
+
 function CategoryPage() {
   const { category: slug } = Route.useParams();
-  const [brandId, setBrandId] = useState<string | null>(null);
-  const [subId, setSubId] = useState<string | null>(null);
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<Sort>("featured");
+  const { brand: brandSlug, type: subSlug, q: search, sort } = Route.useSearch();
+  const navigate = useNavigate({ from: "/category/$category" });
+  type Filters = { brand: string; type: string; q: string; sort: Sort };
+  const setFilter = (patch: Partial<Filters>) =>
+    navigate({ search: (prev: Filters) => ({ ...prev, ...patch }), replace: true });
+
+
 
   const { data: category, isLoading: catLoading } = useQuery({
     queryKey: ["category", slug],
@@ -78,6 +88,11 @@ function CategoryPage() {
     },
   });
 
+  const activeBrand = brands.find((b) => b.slug === brandSlug) ?? null;
+  const activeSub = subs.find((s) => s.slug === subSlug) ?? null;
+  const brandId = activeBrand?.id ?? null;
+  const subId = activeSub?.id ?? null;
+
   // Client-side, instant filtering — no page refresh needed.
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -97,9 +112,14 @@ function CategoryPage() {
     return list;
   }, [products, brandId, subId, search, sort]);
 
-  const activeBrand = brands.find((b) => b.id === brandId);
-  const activeSub = subs.find((s) => s.id === subId);
-  const hasFilters = brandId !== null || subId !== null || search !== "";
+  // Counts respect the *other* active filter so combinations stay coherent.
+  const brandCount = (id: string) =>
+    products.filter((p) => p.brand_id === id && (subId === null || p.subcategory_id === subId)).length;
+  const subCount = (id: string) =>
+    products.filter((p) => p.subcategory_id === id && (brandId === null || p.brand_id === brandId)).length;
+
+  const hasFilters = brandSlug !== "" || subSlug !== "" || search !== "";
+
 
   if (catLoading || !category) {
     return (
@@ -136,12 +156,20 @@ function CategoryPage() {
             <section>
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3">Brand</h2>
               <div className="flex flex-wrap gap-2">
-                <button className={chip(brandId === null)} onClick={() => setBrandId(null)}>All brands</button>
-                {brands.map((b) => (
-                  <button key={b.id} className={chip(brandId === b.id)} onClick={() => setBrandId(brandId === b.id ? null : b.id)}>
-                    {b.name}
-                  </button>
-                ))}
+                <button className={chip(brandSlug === "")} onClick={() => setFilter({ brand: "" })}>All brands</button>
+                {brands.map((b) => {
+                  const n = brandCount(b.id);
+                  return (
+                    <button
+                      key={b.id}
+                      disabled={n === 0 && brandSlug !== b.slug}
+                      className={`${chip(brandSlug === b.slug)} disabled:opacity-40 disabled:cursor-not-allowed`}
+                      onClick={() => setFilter({ brand: brandSlug === b.slug ? "" : b.slug })}
+                    >
+                      {b.name} <span className="opacity-60">({n})</span>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           )}
@@ -150,12 +178,20 @@ function CategoryPage() {
             <section>
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-3">Type</h2>
               <div className="flex flex-wrap gap-2">
-                <button className={chip(subId === null)} onClick={() => setSubId(null)}>All types</button>
-                {subs.map((s) => (
-                  <button key={s.id} className={chip(subId === s.id)} onClick={() => setSubId(subId === s.id ? null : s.id)}>
-                    {s.name}
-                  </button>
-                ))}
+                <button className={chip(subSlug === "")} onClick={() => setFilter({ type: "" })}>All types</button>
+                {subs.map((s) => {
+                  const n = subCount(s.id);
+                  return (
+                    <button
+                      key={s.id}
+                      disabled={n === 0 && subSlug !== s.slug}
+                      className={`${chip(subSlug === s.slug)} disabled:opacity-40 disabled:cursor-not-allowed`}
+                      onClick={() => setFilter({ type: subSlug === s.slug ? "" : s.slug })}
+                    >
+                      {s.name} <span className="opacity-60">({n})</span>
+                    </button>
+                  );
+                })}
               </div>
             </section>
           )}
@@ -165,14 +201,14 @@ function CategoryPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => setFilter({ q: e.target.value })}
                 placeholder={`Search ${category.name.toLowerCase()}…`}
                 className="pl-11 h-12 rounded-full"
               />
             </div>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
+              onChange={(e) => setFilter({ sort: e.target.value as Sort })}
               className="h-12 rounded-full border border-border bg-background px-5 text-sm"
             >
               <option value="featured">Featured</option>
@@ -183,11 +219,13 @@ function CategoryPage() {
             </select>
             {hasFilters && (
               <Button variant="outline" className="h-12 rounded-full"
-                onClick={() => { setBrandId(null); setSubId(null); setSearch(""); }}>
+                onClick={() => setFilter({ brand: "", type: "", q: "" })}>
                 <X className="h-4 w-4 mr-2" /> Clear
               </Button>
             )}
           </div>
+
+
 
           <div className="text-sm text-muted-foreground">
             Showing <span className="font-semibold text-foreground">{filtered.length}</span>{" "}

@@ -1,9 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { Users, ShoppingCart, Clock, Package, AlertTriangle, DollarSign, TrendingUp, ArrowRight } from "lucide-react";
+import { Users, ShoppingCart, Clock, Package, AlertTriangle, DollarSign, TrendingUp, ArrowRight, Heart, UserPlus } from "lucide-react";
 import { getAdminMetrics } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
 export const Route = createFileRoute("/admin/_gated/dashboard")({
   component: DashboardPage,
@@ -20,6 +21,13 @@ const STATUS_COLORS: Record<string, string> = {
 
 function DashboardPage() {
   const fetchMetrics = useServerFn(getAdminMetrics);
+
+  // Every metric recomputes the moment the underlying data changes.
+  useRealtimeSync(
+    ["profiles", "registration_applications", "products", "orders", "wishlist_items", "cart_items"],
+    [["admin", "metrics"]],
+  );
+
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "metrics"],
     queryFn: () => fetchMetrics({}),
@@ -41,7 +49,20 @@ function DashboardPage() {
     { label: "Out of Stock", value: data?.outOfStock ?? 0, icon: AlertTriangle, color: "text-destructive" },
     { label: "Suspended", value: data?.suspendedCustomers ?? 0, icon: Users, color: "text-slate-600" },
     { label: "Delivered", value: data?.byStatus?.delivered ?? 0, icon: ShoppingCart, color: "text-emerald-600" },
+    {
+      label: "Wishlist Activity",
+      value: `${data?.wishlistItems ?? 0} saves · ${data?.wishlistUsers ?? 0} shoppers`,
+      icon: Heart,
+      color: "text-rose-500",
+    },
+    {
+      label: "Cart Activity",
+      value: `${data?.cartItems ?? 0} items · ${data?.cartUsers ?? 0} shoppers`,
+      icon: ShoppingCart,
+      color: "text-primary",
+    },
   ];
+
 
 
   return (
@@ -125,7 +146,55 @@ function DashboardPage() {
             ))}
           </div>
         </div>
+
+        {/* Recent registrations */}
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display font-bold text-lg">Recent registrations</h2>
+            <Link to="/admin/applications" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
+              Review <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          <div className="space-y-2">
+            {(data?.recentRegistrations ?? []).length === 0 && (
+              <p className="text-sm text-muted-foreground">No registrations yet.</p>
+            )}
+            {(data?.recentRegistrations ?? []).map((r: any) => (
+              <div key={r.id} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
+                <UserPlus className="h-4 w-4 text-primary shrink-0" />
+                <div className="min-w-0 flex-1">
+                  <div className="text-sm font-medium truncate">{r.full_name || r.username || r.email}</div>
+                  <div className="text-xs text-muted-foreground truncate">{r.email}</div>
+                </div>
+                <span className="text-[10px] uppercase px-1.5 py-0.5 rounded-full font-semibold bg-accent">{r.status}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Live shopper activity */}
+        <div className="bg-card border border-border rounded-2xl p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display font-bold text-lg">Live shopper activity</h2>
+            <Link to="/admin/activity" className="text-sm text-primary hover:underline inline-flex items-center gap-1">
+              Details <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-4 rounded-xl bg-accent">
+              <div className="text-xs text-muted-foreground">Wishlist saves</div>
+              <div className="text-2xl font-bold">{data?.wishlistItems ?? 0}</div>
+              <div className="text-xs text-muted-foreground">{data?.wishlistUsers ?? 0} shoppers</div>
+            </div>
+            <div className="p-4 rounded-xl bg-accent">
+              <div className="text-xs text-muted-foreground">Items in carts</div>
+              <div className="text-2xl font-bold">{data?.cartItems ?? 0}</div>
+              <div className="text-xs text-muted-foreground">{data?.cartUsers ?? 0} shoppers</div>
+            </div>
+          </div>
+        </div>
       </div>
+
     </div>
   );
 }

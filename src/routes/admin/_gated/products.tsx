@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { upsertProduct, deleteProduct } from "@/lib/admin.functions";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+
 import { SingleImageUploader, MultiImageUploader } from "@/components/ImageUploader";
 import { formatNaira } from "@/lib/format";
 
@@ -50,6 +52,10 @@ function ProductsPage() {
   const [q, setQ] = useState("");
   const [catFilter, setCatFilter] = useState<string>("all");
   const [stockFilter, setStockFilter] = useState<"all" | "in" | "low" | "out">("all");
+
+  // Inventory edits from any admin session show up immediately.
+  useRealtimeSync(["products"], [["admin", "products"], ["admin", "metrics"]]);
+
 
   const { data: products = [], isLoading } = useQuery({
     queryKey: ["admin", "products"],

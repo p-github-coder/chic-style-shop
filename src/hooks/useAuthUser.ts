@@ -6,8 +6,10 @@ export type AuthProfile = {
   id: string;
   email: string;
   full_name: string;
+  username: string;
   status: string;
 } | null;
+
 
 /**
  * Shared, cached view of the signed-in customer (auth user + profile).
@@ -35,15 +37,17 @@ export function useAuthUser() {
       if (!data.user) return null;
       const { data: profile } = await supabase
         .from("profiles")
-        .select("id, email, full_name, status")
+        .select("id, email, full_name, username, status")
         .eq("id", data.user.id)
         .maybeSingle();
       return {
         id: data.user.id,
         email: data.user.email ?? profile?.email ?? "",
         full_name: profile?.full_name ?? "",
+        username: profile?.username ?? "",
         status: profile?.status ?? "pending",
       };
+
     },
   });
 }

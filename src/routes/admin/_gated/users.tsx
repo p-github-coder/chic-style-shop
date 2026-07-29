@@ -6,22 +6,42 @@ import { Loader2, Search, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { listUsers } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
 export const Route = createFileRoute("/admin/_gated/users")({
   component: UsersPage,
 });
 
+const STATUS_CLS: Record<string, string> = {
+  approved: "bg-emerald-100 text-emerald-800",
+  pending: "bg-amber-100 text-amber-800",
+  rejected: "bg-red-100 text-red-800",
+  suspended: "bg-slate-200 text-slate-800",
+};
+
 function UsersPage() {
   const list = useServerFn(listUsers);
   const [q, setQ] = useState("");
 
-  const { data = [], isLoading } = useQuery({ queryKey: ["admin", "users"], queryFn: () => list({}) });
+  // Live refresh whenever any customer-facing table changes.
+  useRealtimeSync(
+    ["profiles", "registration_applications", "orders", "wishlist_items", "cart_items"],
+    [["admin", "users"]],
+  );
+
+  const { data = [], isLoading } = useQuery({
+    queryKey: ["admin", "users"],
+    queryFn: () => list({}),
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
+  });
 
   const filtered = (data as any[]).filter((u) =>
     (u.full_name + " " + u.email + " " + (u.username ?? "") + " " + (u.phone ?? ""))
       .toLowerCase()
       .includes(q.toLowerCase()),
   );
+
 
   return (
     <div className="p-8 max-w-7xl mx-auto">
@@ -55,9 +75,11 @@ function UsersPage() {
                   <th className="text-left p-3">Age</th>
                   <th className="text-left p-3">Location</th>
                   <th className="text-left p-3">Joined</th>
+                  <th className="text-left p-3">Status</th>
                   <th className="text-right p-3">Wishlist</th>
                   <th className="text-right p-3">Cart</th>
                   <th className="text-right p-3">Orders</th>
+                  <th className="text-left p-3">Last order</th>
                   <th className="text-right p-3">Spent</th>
                 </tr>
               </thead>
@@ -73,15 +95,22 @@ function UsersPage() {
                     <td className="p-3 text-xs">{u.age ?? "—"}</td>
                     <td className="p-3 text-xs">{[u.city, u.state].filter(Boolean).join(", ") || "—"}</td>
                     <td className="p-3 text-xs">{new Date(u.created_at).toLocaleDateString()}</td>
+                    <td className="p-3">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_CLS[u.status] ?? ""}`}>
+                        {u.status}
+                      </span>
+                    </td>
                     <td className="p-3 text-right">{u.wishlistCount}</td>
                     <td className="p-3 text-right">{u.cartCount}</td>
                     <td className="p-3 text-right">{u.orderCount}</td>
+                    <td className="p-3 text-xs">{u.lastOrderAt ? new Date(u.lastOrderAt).toLocaleDateString() : "—"}</td>
                     <td className="p-3 text-right">{formatNaira(u.orderTotal)}</td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
-                  <tr><td colSpan={10} className="p-8 text-center text-muted-foreground">No approved customers yet.</td></tr>
+                  <tr><td colSpan={12} className="p-8 text-center text-muted-foreground">No approved customers yet.</td></tr>
                 )}
+
               </tbody>
             </table>
           </div>

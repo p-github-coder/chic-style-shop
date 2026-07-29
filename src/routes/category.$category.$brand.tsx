@@ -1,4 +1,4 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { Loader2, Search, SlidersHorizontal } from "lucide-react";
@@ -9,20 +9,29 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 
+type Sort = "featured" | "newest" | "price-asc" | "price-desc" | "rating";
+type Filters = { type: string; q: string; sort: Sort };
+
 export const Route = createFileRoute("/category/$category/$brand")({
   ssr: false,
+  // Filters live in the URL so Brand + Type combinations are shareable.
+  validateSearch: (search: Record<string, unknown>): Filters => ({
+    type: typeof search.type === "string" ? search.type : "",
+    q: typeof search.q === "string" ? search.q : "",
+    sort: typeof search.sort === "string" ? (search.sort as Sort) : "featured",
+  }),
   component: BrandPage,
 });
 
-type Sort = "featured" | "newest" | "price-asc" | "price-desc" | "rating";
-
 function BrandPage() {
   const { category: catSlug, brand: brandSlug } = Route.useParams();
-  const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<Sort>("featured");
+  const { type: subSlug, q: search, sort } = Route.useSearch();
+  const navigate = useNavigate({ from: "/category/$category/$brand" });
+  const setFilter = (patch: Partial<Filters>) =>
+    navigate({ search: (prev: Filters) => ({ ...prev, ...patch }), replace: true });
   const [maxPrice, setMaxPrice] = useState<number>(20_000_000);
   const [showFilters, setShowFilters] = useState(false);
-  const [subId, setSubId] = useState<string | null>(null);
+
 
   const { data: ctx, isLoading } = useQuery({
     queryKey: ["brand-ctx", catSlug, brandSlug],
@@ -71,6 +80,8 @@ function BrandPage() {
     },
   });
 
+  const subId = subs.find((s) => s.slug === subSlug)?.id ?? null;
+
   const filtered = useMemo(() => {
     let list = products.filter(
       (p) =>
@@ -98,6 +109,10 @@ function BrandPage() {
     }
     return list;
   }, [products, search, sort, maxPrice, subId]);
+
+  // Only types this brand actually stocks are offered.
+  const subCount = (id: string) => products.filter((p) => p.subcategory_id === id).length;
+
 
   if (isLoading || !ctx) {
     return (
@@ -132,24 +147,28 @@ function BrandPage() {
           {subs.length > 0 && (
             <div className="mt-6 flex flex-wrap gap-2">
               <button
-                onClick={() => setSubId(null)}
+                onClick={() => setFilter({ type: "" })}
                 className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                  subId === null ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
+                  subSlug === "" ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
                 }`}
               >
                 All types
               </button>
-              {subs.map((s) => (
-                <button
-                  key={s.id}
-                  onClick={() => setSubId(subId === s.id ? null : s.id)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors ${
-                    subId === s.id ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
-                  }`}
-                >
-                  {s.name}
-                </button>
-              ))}
+              {subs.map((s) => {
+                const n = subCount(s.id);
+                return (
+                  <button
+                    key={s.id}
+                    disabled={n === 0 && subSlug !== s.slug}
+                    onClick={() => setFilter({ type: subSlug === s.slug ? "" : s.slug })}
+                    className={`px-4 py-2 rounded-full text-sm font-medium border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
+                      subSlug === s.slug ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-accent"
+                    }`}
+                  >
+                    {s.name} <span className="opacity-60">({n})</span>
+                  </button>
+                );
+              })}
             </div>
           )}
 
@@ -158,14 +177,15 @@ function BrandPage() {
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => setFilter({ q: e.target.value })}
                 placeholder="Search this brand…"
                 className="pl-11 h-12 rounded-full"
               />
             </div>
             <select
               value={sort}
-              onChange={(e) => setSort(e.target.value as Sort)}
+              onChange={(e) => setFilter({ sort: e.target.value as Sort })}
+
               className="h-12 rounded-full border border-border bg-background px-5 text-sm"
             >
               <option value="featured">Featured</option>

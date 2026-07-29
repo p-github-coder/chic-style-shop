@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { listOrders, updateOrderStatus, getOrderDetails } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+
 
 export const Route = createFileRoute("/admin/_gated/orders")({
   component: OrdersPage,
@@ -29,7 +31,11 @@ function OrdersPage() {
   const qc = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
 
+  // New orders and status changes appear without a manual refresh.
+  useRealtimeSync(["orders", "order_items"], [["admin", "orders"], ["admin", "metrics"]]);
+
   const { data = [], isLoading } = useQuery({ queryKey: ["admin", "orders"], queryFn: () => list({}) });
+
   const { data: detail } = useQuery({
     queryKey: ["admin", "order", openId],
     queryFn: () => details({ data: { orderId: openId! } }),

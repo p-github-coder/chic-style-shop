@@ -37,7 +37,11 @@ type Category = {
 
 function LandingPage() {
   const { data: authUser } = useAuthUser();
-  const firstName = (authUser?.full_name || authUser?.email || "").split(" ")[0].split("@")[0];
+  // Prefer the registered username, then first name, then the email handle.
+  const displayName =
+    authUser?.username?.trim() ||
+    (authUser?.full_name || authUser?.email || "").split(" ")[0].split("@")[0];
+
 
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
@@ -87,7 +91,7 @@ function LandingPage() {
           <section className="bg-accent border-b border-border">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-3">
               <p className="font-display font-semibold text-lg">
-                Welcome, <span className="text-primary capitalize">{firstName}</span> 👋
+                Welcome, <span className="text-primary capitalize">{displayName}</span> 👋
               </p>
               <div className="flex gap-2">
                 <Button asChild size="sm" variant="outline" className="rounded-full">
