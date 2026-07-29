@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Check, X, Loader2, Clock, CheckCircle2, XCircle, Trash2, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 import {
   listApplications,
   approveApplication,
@@ -12,6 +13,7 @@ import {
   suspendApplication,
   deleteApplication,
 } from "@/lib/admin.functions";
+
 
 export const Route = createFileRoute("/admin/_gated/applications")({
   component: ApplicationsPage,
@@ -50,10 +52,16 @@ function ApplicationsPage() {
   const deleteFn = useServerFn(deleteApplication);
   const [filter, setFilter] = useState<"all" | Status>("pending");
 
+  // Signups land instantly — no manual refresh needed.
+  useRealtimeSync(["registration_applications", "profiles"], [["admin", "applications"], ["admin", "metrics"], ["admin", "users"]]);
+
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ["admin", "applications"],
     queryFn: () => fetchApps({}) as Promise<Application[]>,
+    refetchInterval: 60_000,
+    refetchOnWindowFocus: true,
   });
+
 
   const refresh = () => qc.invalidateQueries({ queryKey: ["admin"] });
 

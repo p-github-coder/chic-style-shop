@@ -146,18 +146,29 @@ export const getAdminMetrics = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await ensureAdmin(context);
-    const [usersRes, appsRes, productsRes, ordersRes, lowStockRes, recentOrdersRes] = await Promise.all([
-      context.supabase.from("profiles").select("id, status", { count: "exact" }),
-      context.supabase.from("registration_applications").select("status"),
-      context.supabase.from("products").select("id, stock", { count: "exact" }),
-      context.supabase.from("orders").select("total, status, created_at"),
-      context.supabase.from("products").select("id, name, stock, image_url").lte("stock", 5).order("stock").limit(10),
-      context.supabase.from("orders").select("id, order_number, customer_name, total, status, created_at").order("created_at", { ascending: false }).limit(10),
-    ]);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const [usersRes, appsRes, productsRes, ordersRes, lowStockRes, recentOrdersRes, recentRegRes, wishRes, cartRes] =
+      await Promise.all([
+        context.supabase.from("profiles").select("id, status", { count: "exact" }),
+        context.supabase.from("registration_applications").select("status"),
+        context.supabase.from("products").select("id, stock", { count: "exact" }),
+        context.supabase.from("orders").select("total, status, created_at"),
+        context.supabase.from("products").select("id, name, stock, image_url").lte("stock", 5).order("stock").limit(10),
+        context.supabase.from("orders").select("id, order_number, customer_name, total, status, created_at").order("created_at", { ascending: false }).limit(10),
+        context.supabase
+          .from("registration_applications")
+          .select("id, full_name, username, email, status, created_at")
+          .order("created_at", { ascending: false })
+          .limit(8),
+        supabaseAdmin.from("wishlist_items").select("user_id"),
+        supabaseAdmin.from("cart_items").select("user_id, quantity"),
+      ]);
     const apps = (appsRes.data ?? []) as { status: string }[];
     const orders = (ordersRes.data ?? []) as { total: number; status: string; created_at: string }[];
     const profiles = (usersRes.data ?? []) as { status: string }[];
     const products = (productsRes.data ?? []) as { stock: number }[];
+    const wishRows = (wishRes.data ?? []) as { user_id: string }[];
+    const cartRows = (cartRes.data ?? []) as { user_id: string; quantity: number }[];
     return {
       totalUsers: usersRes.count ?? 0,
       approvedCustomers: profiles.filter((p) => p.status === "approved").length,
@@ -172,10 +183,17 @@ export const getAdminMetrics = createServerFn({ method: "GET" })
       lowStock: products.filter((p) => p.stock > 0 && p.stock <= 5).length,
       totalOrders: orders.length,
       revenue: orders.filter((o) => o.status !== "cancelled").reduce((s, o) => s + Number(o.total || 0), 0),
+      // Live wishlist / cart activity across all shoppers.
+      wishlistItems: wishRows.length,
+      wishlistUsers: new Set(wishRows.map((w) => w.user_id)).size,
+      cartItems: cartRows.reduce((s, c) => s + Number(c.quantity || 0), 0),
+      cartUsers: new Set(cartRows.map((c) => c.user_id)).size,
       byStatus: ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"].reduce<Record<string, number>>((acc, s) => { acc[s] = orders.filter((o) => o.status === s).length; return acc; }, {}),
       lowStockItems: lowStockRes.data ?? [],
       recentOrders: recentOrdersRes.data ?? [],
+      recentRegistrations: recentRegRes.data ?? [],
     };
+
   });
 
 // -------- Customers (approved only) --------
@@ -187,7 +205,7 @@ export const listUsers = createServerFn({ method: "GET" })
     const [profilesRes, rolesRes, ordersRes, wishRes, cartRes] = await Promise.all([
       context.supabase.from("profiles").select("*").eq("status", "approved").order("created_at", { ascending: false }),
       context.supabase.from("user_roles").select("user_id, role"),
-      context.supabase.from("orders").select("user_id, total"),
+      context.supabase.from("orders").select("user_id, total, status, created_at"),
       supabaseAdmin.from("wishlist_items").select("user_id"),
       supabaseAdmin.from("cart_items").select("user_id, quantity"),
     ]);
@@ -197,10 +215,13 @@ export const listUsers = createServerFn({ method: "GET" })
       list.push(r.role);
       roles.set(r.user_id, list);
     }
-    const orderStats = new Map<string, { count: number; total: number }>();
-    for (const o of (ordersRes.data ?? []) as { user_id: string; total: number }[]) {
-      const s = orderStats.get(o.user_id) ?? { count: 0, total: 0 };
-      s.count++; s.total += Number(o.total);
+    const orderStats = new Map<string, { count: number; total: number; lastAt: string | null }>();
+    for (const o of (ordersRes.data ?? []) as { user_id: string; total: number; status: string; created_at: string }[]) {
+      const s = orderStats.get(o.user_id) ?? { count: 0, total: 0, lastAt: null };
+      s.count++;
+      // Spend reflects money actually committed — cancelled orders don't count.
+      if (o.status !== "cancelled") s.total += Number(o.total);
+      if (!s.lastAt || o.created_at > s.lastAt) s.lastAt = o.created_at;
       orderStats.set(o.user_id, s);
     }
     const wishCounts = new Map<string, number>();
@@ -219,9 +240,11 @@ export const listUsers = createServerFn({ method: "GET" })
         roles: roles.get(p.id) ?? [],
         orderCount: orderStats.get(p.id)?.count ?? 0,
         orderTotal: orderStats.get(p.id)?.total ?? 0,
+        lastOrderAt: orderStats.get(p.id)?.lastAt ?? null,
         wishlistCount: wishCounts.get(p.id) ?? 0,
         cartCount: cartCounts.get(p.id) ?? 0,
       }));
+
 
   });
 
