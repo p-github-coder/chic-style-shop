@@ -4,6 +4,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { Heart, ShoppingCart, Loader2, TrendingUp } from "lucide-react";
 import { getCustomerActivity } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 
 export const Route = createFileRoute("/admin/_gated/activity")({
   component: ActivityPage,
@@ -11,11 +12,16 @@ export const Route = createFileRoute("/admin/_gated/activity")({
 
 function ActivityPage() {
   const fetchActivity = useServerFn(getCustomerActivity);
+
+  // Wishlist and cart changes stream in live.
+  useRealtimeSync(["wishlist_items", "cart_items", "products"], [["admin", "activity"], ["admin", "metrics"]]);
+
   const { data, isLoading } = useQuery({
     queryKey: ["admin", "activity"],
     queryFn: () => fetchActivity({}),
     refetchInterval: 30_000,
   });
+
 
   const cards = [
     { label: "Wishlist saves", value: data?.wishlist.length ?? 0, icon: Heart },
