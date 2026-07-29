@@ -29,7 +29,11 @@ function OrdersPage() {
   const qc = useQueryClient();
   const [openId, setOpenId] = useState<string | null>(null);
 
+  // New orders and status changes appear without a manual refresh.
+  useRealtimeSync(["orders", "order_items"], [["admin", "orders"], ["admin", "metrics"]]);
+
   const { data = [], isLoading } = useQuery({ queryKey: ["admin", "orders"], queryFn: () => list({}) });
+
   const { data: detail } = useQuery({
     queryKey: ["admin", "order", openId],
     queryFn: () => details({ data: { orderId: openId! } }),
