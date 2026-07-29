@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { upsertProduct, deleteProduct } from "@/lib/admin.functions";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+
 import { SingleImageUploader, MultiImageUploader } from "@/components/ImageUploader";
 import { formatNaira } from "@/lib/format";
 
