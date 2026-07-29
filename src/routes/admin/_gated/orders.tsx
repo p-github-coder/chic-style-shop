@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { listOrders, updateOrderStatus, getOrderDetails } from "@/lib/admin.functions";
 import { formatNaira } from "@/lib/format";
+import { useRealtimeSync } from "@/hooks/useRealtimeSync";
+
 
 export const Route = createFileRoute("/admin/_gated/orders")({
   component: OrdersPage,
