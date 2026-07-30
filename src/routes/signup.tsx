@@ -1,12 +1,13 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, EyeOff, ShoppingBag } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/Brand";
 
 export const Route = createFileRoute("/signup")({
   ssr: false,
@@ -87,7 +88,7 @@ function SignupPage() {
       <div className="min-h-screen flex items-center justify-center p-6 bg-background">
         <div className="max-w-md w-full text-center bg-card border border-border rounded-3xl p-10">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-accent text-primary mb-4">
-            <ShoppingBag className="h-8 w-8" />
+            <BrandLogo className="h-9 w-9" />
           </div>
           <h1 className="text-2xl font-display font-bold">Application submitted</h1>
           <p className="mt-3 text-muted-foreground">
@@ -107,23 +108,23 @@ function SignupPage() {
       <div className="hidden lg:flex flex-col justify-between p-12 text-primary-foreground relative overflow-hidden"
         style={{ background: "var(--gradient-primary)" }}>
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-2xl">
-          <ShoppingBag className="h-7 w-7" /> MaisonFemme
+          <BrandLogo className="h-9 w-9" /> PameLuxury
         </Link>
         <div>
           <h1 className="text-5xl font-display font-extrabold leading-tight">
-            Join the<br />MaisonFemme circle.
+            Join the<br />PameLuxury circle.
           </h1>
           <p className="mt-4 text-lg opacity-90 max-w-md">
             Save your favorites, track orders and get first access to new drops.
           </p>
         </div>
-        <p className="text-sm opacity-80">© {new Date().getFullYear()} MaisonFemme</p>
+        <p className="text-sm opacity-80">© {new Date().getFullYear()} PameLuxury</p>
       </div>
 
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           <Link to="/" className="lg:hidden flex items-center gap-2 font-display font-bold text-xl text-primary mb-8">
-            <ShoppingBag className="h-6 w-6" /> MaisonFemme
+            <BrandLogo className="h-8 w-8" /> PameLuxury
           </Link>
           <h2 className="text-3xl font-display font-bold">Create your account</h2>
           <p className="mt-2 text-muted-foreground">Accounts are reviewed by our team before first sign in.</p>

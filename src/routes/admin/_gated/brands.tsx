@@ -71,7 +71,7 @@ function BrandsPage() {
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-2">
                 {(byCat.get(c.id) ?? []).map((b) => (
                   <div key={b.id} className="flex items-center gap-3 p-2 border border-border rounded-xl">
-                    {b.logo_url ? <img src={b.logo_url} alt="" className="h-8 w-8 rounded object-cover" /> : <div className="h-8 w-8 rounded bg-accent" />}
+                    {b.logo_url ? <img loading="lazy" decoding="async" src={b.logo_url} alt="" className="h-8 w-8 rounded object-cover" /> : <div className="h-8 w-8 rounded bg-accent" />}
                     <div className="flex-1 min-w-0">
                       <div className="text-sm font-medium truncate">{b.name}</div>
                       <div className="text-[10px] text-muted-foreground truncate">/{b.slug}</div>

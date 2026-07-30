@@ -12,6 +12,8 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { SplashScreen } from "@/components/SplashScreen";
+
 
 function NotFoundComponent() {
   return (
@@ -77,7 +79,9 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     ],
     links: [
       { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
+
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       {
         rel: "stylesheet",
@@ -120,8 +124,10 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <SplashScreen />
       <Outlet />
       <Toaster position="top-right" richColors />
     </QueryClientProvider>
+
   );
 }

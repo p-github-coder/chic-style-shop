@@ -334,6 +334,7 @@ const productSchema = z.object({
   brand_id: z.string().uuid().nullable(),
   colors: z.array(z.string()).default([]),
   sizes: z.array(z.string()).default([]),
+  rating: z.number().min(0).max(5).default(0),
   best_seller: z.boolean().default(false),
   new_arrival: z.boolean().default(false),
   featured: z.boolean().default(false),

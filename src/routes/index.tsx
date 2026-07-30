@@ -6,18 +6,19 @@ import { Navbar } from "@/components/Navbar";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { ProductCard, type Product } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/Brand";
 
 export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "PameLuxury— Premium Women's Accessories" },
+      { title: "PameLuxury — Premium Women's Accessories" },
       {
         name: "description",
         content:
           "Curated bags, jewelry, watches, hair accessories, fashion accessories and beauty essentials from the world's finest brands. Delivered across Nigeria.",
       },
-      { property: "og:title", content: "PameLuxury— Premium Women's Accessories" },
+      { property: "og:title", content: "PameLuxury — Premium Women's Accessories" },
       {
         property: "og:description",
         content: "Curated bags, jewelry, watches, hair accessories, fashion accessories and beauty essentials from the world's finest brands. Delivered across Nigeria.",
@@ -114,28 +115,13 @@ function LandingPage() {
                 <Sparkles className="h-3.5 w-3.5" /> New Season · Autumn Edit
               </div>
               <h1 className="mt-5 text-5xl sm:text-7xl font-display font-extrabold leading-[1.05]">
-                Timeless<br />by design.
+                Luxury,<br />curated for you.
               </h1>
               <p className="mt-5 text-lg sm:text-xl opacity-90 max-w-lg">
-                Bags, jewelry, watches and beauty from the houses she loves. Curated for the modern woman.
+                A collection of refined accessories, beauty essentials, and timeless pieces from brands you
+                love — thoughtfully chosen for modern living.
               </p>
-              <div className="mt-8 flex flex-wrap gap-3">
-                <Button asChild size="lg" variant="secondary" className="rounded-full">
-                  <Link to="/category/$category" params={{ category: "bags" }}>
-                    Shop bags <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
-                <Button
-                  asChild
-                  size="lg"
-                  variant="outline"
-                  className="rounded-full bg-white/10 border-white/30 text-primary-foreground hover:bg-white/20 hover:text-primary-foreground"
-                >
-                  <Link to="/category/$category" params={{ category: "jewelry" }}>
-                    Explore jewelry
-                  </Link>
-                </Button>
-              </div>
+
             </div>
           </div>
         </section>
@@ -248,7 +234,9 @@ function LandingPage() {
         <footer className="border-t border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid md:grid-cols-4 gap-8 text-sm">
             <div>
-              <div className="font-display font-bold text-lg text-primary">MaisonFemme</div>
+              <div className="flex items-center gap-2 font-display font-bold text-lg text-primary">
+                <BrandLogo className="h-8 w-8" /> PameLuxury
+              </div>
               <p className="mt-2 text-muted-foreground">Premium women's accessories, delivered across Nigeria.</p>
             </div>
             <div>
@@ -281,7 +269,7 @@ function LandingPage() {
             </div>
           </div>
           <div className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-            © {new Date().getFullYear()} MaisonFemme. All rights reserved.
+            © {new Date().getFullYear()} PameLuxury. All rights reserved.
             <span className="mx-2">·</span>
             <Link to="/admin/login" className="hover:text-foreground underline-offset-2 hover:underline">
               Admin

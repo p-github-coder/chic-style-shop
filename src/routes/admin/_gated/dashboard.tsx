@@ -137,7 +137,7 @@ function DashboardPage() {
             {(data?.lowStockItems ?? []).length === 0 && <p className="text-sm text-muted-foreground">All products well stocked.</p>}
             {(data?.lowStockItems ?? []).map((p: any) => (
               <div key={p.id} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
-                <img src={p.image_url} alt="" className="h-10 w-10 rounded object-cover" />
+                <img loading="lazy" decoding="async" src={p.image_url} alt="" className="h-10 w-10 rounded object-cover" />
                 <div className="flex-1 min-w-0 text-sm truncate">{p.name}</div>
                 <span className={`text-xs font-semibold ${p.stock === 0 ? "text-destructive" : "text-amber-600"}`}>
                   {p.stock === 0 ? "Out of stock" : `${p.stock} left`}

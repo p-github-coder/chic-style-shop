@@ -1,7 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { CheckCircle2, Loader2, Truck } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { z } from "zod";
 import { supabase } from "@/integrations/supabase/client";
 import { Navbar } from "@/components/Navbar";
@@ -43,6 +44,8 @@ function CheckoutPage() {
   const [payment, setPayment] = useState("cod");
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Temu-style selective checkout: only ticked items are purchased.
+  const [selected, setSelected] = useState<Record<string, boolean> | null>(null);
 
   const { data: items, isLoading } = useQuery({
     queryKey: ["cart"],
@@ -55,8 +58,28 @@ function CheckoutPage() {
     },
   });
 
-  const subtotal = (items ?? []).reduce((s, it) => s + Number(it.products.price) * it.quantity, 0);
-  const delivery = subtotal >= 50_000 ? 0 : DELIVERY_FEE;
+  // Default to everything selected the first time the cart loads.
+  useEffect(() => {
+    if (!items) return;
+    setSelected((prev) => {
+      const next: Record<string, boolean> = {};
+      for (const it of items) next[it.id] = prev?.[it.id] ?? true;
+      return next;
+    });
+  }, [items]);
+
+  const isSelected = (id: string) => selected?.[id] ?? true;
+  const chosen = (items ?? []).filter((it) => isSelected(it.id));
+  const allSelected = (items ?? []).length > 0 && chosen.length === (items ?? []).length;
+
+  const toggle = (id: string) => setSelected((prev) => ({ ...(prev ?? {}), [id]: !(prev?.[id] ?? true) }));
+  const toggleAll = () => {
+    const value = !allSelected;
+    setSelected(Object.fromEntries((items ?? []).map((it) => [it.id, value])));
+  };
+
+  const subtotal = chosen.reduce((s, it) => s + Number(it.products.price) * it.quantity, 0);
+  const delivery = chosen.length === 0 ? 0 : subtotal >= 50_000 ? 0 : DELIVERY_FEE;
   const total = subtotal + delivery;
 
   const placeOrder = useMutation({
@@ -69,7 +92,7 @@ function CheckoutPage() {
         throw new Error("Please fix the errors above");
       }
       setErrors({});
-      if (!items || items.length === 0) throw new Error("Cart is empty");
+      if (chosen.length === 0) throw new Error("Select at least one item to purchase");
       const { data: userData } = await supabase.auth.getUser();
       if (!userData.user) throw new Error("Not signed in");
 
@@ -90,7 +113,7 @@ function CheckoutPage() {
       if (orderErr) throw orderErr;
 
       const { error: itemsErr } = await supabase.from("order_items").insert(
-        items.map((it) => ({
+        chosen.map((it) => ({
           order_id: order.id,
           product_id: it.product_id,
           product_name: it.products.name,
@@ -101,7 +124,11 @@ function CheckoutPage() {
       );
       if (itemsErr) throw itemsErr;
 
-      const { error: clearErr } = await supabase.from("cart_items").delete().eq("user_id", userData.user.id);
+      // Only the purchased items leave the cart — unselected items stay.
+      const { error: clearErr } = await supabase
+        .from("cart_items")
+        .delete()
+        .in("id", chosen.map((it) => it.id));
       if (clearErr) throw clearErr;
     },
     onSuccess: () => {
@@ -210,11 +237,18 @@ function CheckoutPage() {
           </div>
 
           <div className="bg-card border border-border rounded-2xl p-6 space-y-4 lg:sticky lg:top-24">
-            <h2 className="font-display font-bold text-xl">Order summary</h2>
+            <div className="flex items-center justify-between">
+              <h2 className="font-display font-bold text-xl">Order summary</h2>
+              <button type="button" onClick={toggleAll} className="text-xs text-primary hover:underline">
+                {allSelected ? "Deselect all" : `Select all (${items.length})`}
+              </button>
+            </div>
             <div className="space-y-3 max-h-64 overflow-auto">
               {items.map((it) => (
-                <div key={it.id} className="flex items-center gap-3 text-sm">
-                  <img src={it.products.image_url} alt={it.products.name}
+                <div key={it.id} className={`flex items-center gap-3 text-sm transition-opacity ${isSelected(it.id) ? "" : "opacity-50"}`}>
+                  <Checkbox checked={isSelected(it.id)} onCheckedChange={() => toggle(it.id)}
+                    aria-label={`Include ${it.products.name} in this order`} />
+                  <img src={it.products.image_url} alt={it.products.name} loading="lazy"
                     className="h-12 w-12 rounded-lg object-cover bg-muted" />
                   <div className="flex-1 min-w-0">
                     <div className="truncate font-medium">{it.products.name}</div>
@@ -224,15 +258,22 @@ function CheckoutPage() {
                 </div>
               ))}
             </div>
+            <div className="flex items-start gap-2 rounded-xl bg-accent p-3 text-xs">
+              <Truck className="h-4 w-4 shrink-0 text-primary mt-0.5" />
+              <span>
+                <strong>Estimated delivery:</strong> your order will arrive within 7 days after successful payment.
+              </span>
+            </div>
             <div className="border-t border-border pt-3 space-y-1.5 text-sm">
+              <div className="flex justify-between"><span className="text-muted-foreground">Selected items</span><span>{chosen.length} of {items.length}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span>{formatNaira(subtotal)}</span></div>
               <div className="flex justify-between"><span className="text-muted-foreground">Delivery</span><span>{delivery === 0 ? "Free" : formatNaira(delivery)}</span></div>
               <div className="flex justify-between font-display font-bold text-lg pt-1">
                 <span>Total</span><span>{formatNaira(total)}</span>
               </div>
             </div>
-            <Button type="submit" disabled={placeOrder.isPending} className="w-full h-11 rounded-full">
-              {placeOrder.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : "Place order"}
+            <Button type="submit" disabled={placeOrder.isPending || chosen.length === 0} className="w-full h-11 rounded-full">
+              {placeOrder.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : `Place order (${chosen.length})`}
             </Button>
             <Button type="button" variant="ghost" onClick={() => navigate({ to: "/cart" })} className="w-full rounded-full">
               Back to cart

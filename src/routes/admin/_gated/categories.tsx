@@ -75,7 +75,7 @@ function CategoriesPage() {
           {categories.map((c) => (
             <div key={c.id} className="bg-card border border-border rounded-2xl p-5">
               <div className="flex items-start gap-4">
-                {c.hero_image && <img src={c.hero_image} alt="" className="h-16 w-16 rounded-xl object-cover" />}
+                {c.hero_image && <img loading="lazy" decoding="async" src={c.hero_image} alt="" className="h-16 w-16 rounded-xl object-cover" />}
                 <div className="flex-1 min-w-0">
                   <div className="font-display font-bold text-lg">{c.name}</div>
                   <div className="text-xs text-muted-foreground">/{c.slug} · sort {c.sort_order}</div>

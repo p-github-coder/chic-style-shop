@@ -1,12 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Eye, EyeOff, ShoppingBag } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
+import { BrandLogo } from "@/components/Brand";
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -45,19 +46,19 @@ function LoginPage() {
     if (profile?.status === "pending") {
       await supabase.auth.signOut();
       setLoading(false);
-      toast.error("Your application is pending admin review.");
+      toast.error("Your account is awaiting administrator approval. You'll be able to sign in once it is approved.");
       return;
     }
     if (profile?.status === "rejected") {
       await supabase.auth.signOut();
       setLoading(false);
-      toast.error("Your application was not approved.");
+      toast.error("Your account has been rejected by the administrator. Please contact support for more information.");
       return;
     }
     if (profile?.status === "suspended") {
       await supabase.auth.signOut();
       setLoading(false);
-      toast.error("Your account has been suspended. Please contact support.");
+      toast.error("Your account has been suspended by the administrator. Please contact support for assistance.");
       return;
     }
 
@@ -71,7 +72,7 @@ function LoginPage() {
       <div className="hidden lg:flex flex-col justify-between p-12 text-primary-foreground relative overflow-hidden"
         style={{ background: "var(--gradient-primary)" }}>
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-2xl">
-          <ShoppingBag className="h-7 w-7" /> MaisonFemme
+          <BrandLogo className="h-9 w-9" /> PameLuxury
         </Link>
         <div className="relative z-10">
           <h1 className="text-5xl font-display font-extrabold leading-tight">
@@ -81,13 +82,13 @@ function LoginPage() {
             Curated bags, jewelry and beauty from the houses she loves.
           </p>
         </div>
-        <p className="text-sm opacity-80">© {new Date().getFullYear()} MaisonFemme</p>
+        <p className="text-sm opacity-80">© {new Date().getFullYear()} PameLuxury</p>
       </div>
 
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           <Link to="/" className="lg:hidden flex items-center gap-2 font-display font-bold text-xl text-primary mb-8">
-            <ShoppingBag className="h-6 w-6" /> MaisonFemme
+            <BrandLogo className="h-8 w-8" /> PameLuxury
           </Link>
           <h2 className="text-3xl font-display font-bold">Welcome back</h2>
           <p className="mt-2 text-muted-foreground">Sign in to continue shopping.</p>

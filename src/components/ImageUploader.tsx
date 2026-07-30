@@ -38,7 +38,7 @@ export function SingleImageUploader({
     <div className="space-y-2">
       <div className="flex items-center gap-3">
         {value ? (
-          <img src={value} alt="" className="h-16 w-16 rounded-lg object-cover border border-border" />
+          <img loading="lazy" decoding="async" src={value} alt="" className="h-16 w-16 rounded-lg object-cover border border-border" />
         ) : (
           <div className="h-16 w-16 rounded-lg bg-accent flex items-center justify-center text-muted-foreground text-xs">
             No image
@@ -109,7 +109,7 @@ export function MultiImageUploader({
       <div className="grid grid-cols-4 gap-2">
         {value.map((u, i) => (
           <div key={u + i} className="relative aspect-square rounded-lg overflow-hidden border border-border group">
-            <img src={u} alt="" className="w-full h-full object-cover" />
+            <img loading="lazy" decoding="async" src={u} alt="" className="w-full h-full object-cover" />
             <button
               type="button"
               onClick={() => onChange(value.filter((_, idx) => idx !== i))}

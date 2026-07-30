@@ -105,3 +105,21 @@
     letter-spacing: -0.02em;
   }
 }
+
+/* --- PameLuxury splash intro --- */
+@keyframes splash-rise {
+  0% { opacity: 0; transform: scale(0.9) translateY(12px); filter: blur(6px); }
+  55% { opacity: 1; transform: scale(1.02) translateY(0); filter: blur(0); }
+  100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+}
+@keyframes splash-pulse {
+  0%, 100% { filter: drop-shadow(0 0 10px color-mix(in oklab, var(--color-primary) 35%, transparent)); }
+  50% { filter: drop-shadow(0 0 34px color-mix(in oklab, var(--color-primary) 65%, transparent)); }
+}
+.splash-glow {
+  animation: splash-rise 1.1s cubic-bezier(0.22, 1, 0.36, 1) both,
+             splash-pulse 2.2s ease-in-out 0.9s infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .splash-glow { animation: none; }
+}

@@ -142,7 +142,7 @@ function CategoryPage() {
       <Navbar />
       <main className="pt-16">
         <section className="relative h-64 sm:h-80 overflow-hidden">
-          <img src={category.hero_image} alt={category.name} className="absolute inset-0 h-full w-full object-cover" />
+          <img loading="lazy" decoding="async" src={category.hero_image} alt={category.name} className="absolute inset-0 h-full w-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-black/30" />
           <div className="relative max-w-7xl mx-auto px-4 sm:px-6 h-full flex flex-col justify-end pb-8 text-white">
             <div className="text-sm opacity-80"><Link to="/" className="hover:underline">Home</Link> / {category.name}</div>

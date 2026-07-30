@@ -5,6 +5,7 @@ import {
 } from "lucide-react";
 import { supabaseAdminClient as supabase } from "@/integrations/supabase/admin-client";
 import { useQueryClient } from "@tanstack/react-query";
+import { BrandLogo } from "@/components/Brand";
 
 const nav = [
   { to: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard, enabled: true },
@@ -38,7 +39,7 @@ export function AdminSidebar() {
     <aside className="w-64 shrink-0 border-r border-border bg-card min-h-screen sticky top-0 flex flex-col">
       <div className="p-6 border-b border-border">
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg text-primary">
-          <ShoppingBag className="h-6 w-6" /> PameLuxury
+          <BrandLogo className="h-8 w-8" /> PameLuxury
         </Link>
         <div className="mt-1 text-xs text-muted-foreground">Admin console</div>
       </div>

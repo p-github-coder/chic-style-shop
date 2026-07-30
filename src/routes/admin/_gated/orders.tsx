@@ -127,7 +127,7 @@ function OrdersPage() {
                   <div className="space-y-2">
                     {detail.items.map((it: any) => (
                       <div key={it.id} className="flex items-center gap-3">
-                        <img src={it.product_image} alt="" className="h-12 w-12 rounded object-cover" />
+                        <img loading="lazy" decoding="async" src={it.product_image} alt="" className="h-12 w-12 rounded object-cover" />
                         <div className="flex-1 min-w-0">
                           <div className="text-sm font-medium truncate">{it.product_name}</div>
                           <div className="text-xs text-muted-foreground">Qty {it.quantity} × {formatNaira(Number(it.price))}</div>
