@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { bootstrapAdmin } from "@/lib/admin.functions";
+import { BrandLogo } from "@/components/Brand";
 
 export const Route = createFileRoute("/admin/login")({
   ssr: false,
