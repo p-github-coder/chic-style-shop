@@ -43,6 +43,7 @@ export function Navbar() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [signedIn, setSignedIn] = useState<boolean | null>(null);
+  const categoryLinks = useCategoryLinks();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSignedIn(!!data.session));
@@ -57,7 +58,12 @@ export function Navbar() {
   async function handleLogout() {
     await queryClient.cancelQueries();
     queryClient.clear();
-    await supabase.auth.signOut();
+    await supabase.auth.signOut({ scope: "local" });
+    if (typeof window !== "undefined") {
+      // Drop any personalised state cached outside React Query.
+      localStorage.removeItem("recently-viewed");
+      sessionStorage.clear();
+    }
     toast.success("Signed out");
     navigate({ to: "/", replace: true });
   }
@@ -79,9 +85,9 @@ export function Navbar() {
           >
             Home
           </Link>
-          {CATEGORY_LINKS.map((c) => (
+          {categoryLinks.map((c) => (
             <Link
-              key={c.slug}
+              key={c.id}
               to="/category/$category"
               params={{ category: c.slug }}
               className={`px-3 py-2 rounded-full text-sm font-medium transition-colors ${
@@ -90,7 +96,7 @@ export function Navbar() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {c.label}
+              {c.name}
             </Link>
           ))}
         </nav>
@@ -154,15 +160,15 @@ export function Navbar() {
             <Link to="/" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent">
               Home
             </Link>
-            {CATEGORY_LINKS.map((c) => (
+            {categoryLinks.map((c) => (
               <Link
-                key={c.slug}
+                key={c.id}
                 to="/category/$category"
                 params={{ category: c.slug }}
                 onClick={() => setOpen(false)}
                 className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent"
               >
-                {c.label}
+                {c.name}
               </Link>
             ))}
             <Link to="/wishlist" onClick={() => setOpen(false)} className="px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-accent flex items-center gap-2">
