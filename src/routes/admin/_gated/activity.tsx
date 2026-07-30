@@ -60,7 +60,7 @@ function ActivityPage() {
               <div className="space-y-2">
                 {data!.topSaved.map((p) => (
                   <div key={p.product_id} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
-                    {p.product_image && <img src={p.product_image} alt="" className="h-10 w-10 rounded object-cover" />}
+                    {p.product_image && <img loading="lazy" decoding="async" src={p.product_image} alt="" className="h-10 w-10 rounded object-cover" />}
                     <div className="flex-1 min-w-0 text-sm truncate">{p.product_name}</div>
                     <span className="text-sm font-semibold">{p.saves} save{p.saves === 1 ? "" : "s"}</span>
                   </div>

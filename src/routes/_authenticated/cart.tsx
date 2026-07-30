@@ -98,7 +98,7 @@ function CartPage() {
                     params={{ slug: it.products.slug ?? "" }}
                     className="shrink-0"
                   >
-                    <img src={it.products.image_url} alt={it.products.name} className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl object-cover bg-muted" />
+                    <img loading="lazy" decoding="async" src={it.products.image_url} alt={it.products.name} className="h-20 w-20 sm:h-24 sm:w-24 rounded-xl object-cover bg-muted" />
                   </Link>
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold truncate">{it.products.name}</h3>

@@ -174,7 +174,7 @@ function ProductsPage() {
                   <tr key={p.id} className="border-t border-border">
                     <td className="p-3">
                       <div className="flex items-center gap-3">
-                        {p.image_url ? <img src={p.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" /> : <div className="h-10 w-10 rounded-lg bg-accent" />}
+                        {p.image_url ? <img loading="lazy" decoding="async" src={p.image_url} alt="" className="h-10 w-10 rounded-lg object-cover" /> : <div className="h-10 w-10 rounded-lg bg-accent" />}
                         <div>
                           <div className="font-medium">{p.name}</div>
                           <div className="text-[10px] text-muted-foreground">/{p.slug}</div>

@@ -285,7 +285,7 @@ function ProductPage() {
                         i === activeImage ? "border-primary" : "border-transparent"
                       }`}
                     >
-                      <img src={img} alt="" className="h-full w-full object-cover" />
+                      <img loading="lazy" decoding="async" src={img} alt="" className="h-full w-full object-cover" />
                     </button>
                   ))}
                 </div>
