@@ -68,12 +68,14 @@ function AdminLoginPage() {
     <div className="min-h-screen flex items-center justify-center p-6 bg-background">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary text-primary-foreground mb-4">
-            <ShieldCheck className="h-7 w-7" />
+          <div className="inline-flex flex-col items-center gap-3 mb-4">
+            <BrandLogo className="h-14 w-14" />
+            <span className="font-display font-extrabold tracking-widest text-primary">PameLuxury</span>
           </div>
           <h1 className="text-3xl font-display font-bold">Admin sign in</h1>
           <p className="text-muted-foreground mt-1">Restricted area — administrators only.</p>
         </div>
+
 
         <form onSubmit={handleSubmit} autoComplete="off" className="bg-card border border-border rounded-3xl p-8 space-y-4">
           <div className="space-y-2">
