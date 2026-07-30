@@ -11,13 +11,13 @@ export const Route = createFileRoute("/")({
   ssr: false,
   head: () => ({
     meta: [
-      { title: "PameLuxury— Premium Women's Accessories" },
+      { title: "PameLuxury — Premium Women's Accessories" },
       {
         name: "description",
         content:
           "Curated bags, jewelry, watches, hair accessories, fashion accessories and beauty essentials from the world's finest brands. Delivered across Nigeria.",
       },
-      { property: "og:title", content: "PameLuxury— Premium Women's Accessories" },
+      { property: "og:title", content: "PameLuxury — Premium Women's Accessories" },
       {
         property: "og:description",
         content: "Curated bags, jewelry, watches, hair accessories, fashion accessories and beauty essentials from the world's finest brands. Delivered across Nigeria.",
@@ -248,7 +248,7 @@ function LandingPage() {
         <footer className="border-t border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid md:grid-cols-4 gap-8 text-sm">
             <div>
-              <div className="font-display font-bold text-lg text-primary">MaisonFemme</div>
+              <div className="font-display font-bold text-lg text-primary">PameLuxury</div>
               <p className="mt-2 text-muted-foreground">Premium women's accessories, delivered across Nigeria.</p>
             </div>
             <div>
@@ -281,7 +281,7 @@ function LandingPage() {
             </div>
           </div>
           <div className="border-t border-border py-6 text-center text-xs text-muted-foreground">
-            © {new Date().getFullYear()} MaisonFemme. All rights reserved.
+            © {new Date().getFullYear()} PameLuxury. All rights reserved.
             <span className="mx-2">·</span>
             <Link to="/admin/login" className="hover:text-foreground underline-offset-2 hover:underline">
               Admin

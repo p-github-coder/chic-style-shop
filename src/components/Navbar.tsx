@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { BrandLockup } from "@/components/Brand";
 
 export function useCartCount(enabled: boolean) {
   return useQuery({
@@ -61,7 +62,7 @@ export function Navbar() {
     await supabase.auth.signOut({ scope: "local" });
     if (typeof window !== "undefined") {
       // Drop any personalised state cached outside React Query.
-      localStorage.removeItem("recently-viewed");
+      localStorage.removeItem("pl:recentlyViewed");
       sessionStorage.clear();
     }
     toast.success("Signed out");
@@ -72,8 +73,7 @@ export function Navbar() {
     <header className="fixed top-0 inset-x-0 z-50 bg-background/85 backdrop-blur-lg border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between gap-4">
         <Link to="/" className="flex items-center gap-2 font-display font-bold text-lg text-primary shrink-0">
-          <ShoppingBag className="h-6 w-6" />
-          <span>Maison<span className="text-foreground">Femme</span></span>
+          <BrandLockup logoClassName="h-8 w-8" />
         </Link>
 
         <nav className="hidden lg:flex items-center gap-1">
