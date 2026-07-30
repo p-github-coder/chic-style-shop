@@ -1,6 +1,6 @@
-import logoAsset from "@/assets/pameluxury-logo.png.asset.json";
+import logoUrl from "@/assets/pameluxury-logo.png";
 
-export const LOGO_URL = logoAsset.url;
+export const LOGO_URL = logoUrl;
 
 /** The PameLuxury mark. Used in nav, auth pages, admin and the splash screen. */
 export function BrandLogo({ className = "h-8 w-8" }: { className?: string }) {
@@ -10,7 +10,7 @@ export function BrandLogo({ className = "h-8 w-8" }: { className?: string }) {
       alt="PameLuxury logo"
       width={64}
       height={64}
-      className={`${className} object-contain rounded-md`}
+      className={`${className} object-contain`}
     />
   );
 }
