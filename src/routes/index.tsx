@@ -6,6 +6,7 @@ import { Navbar } from "@/components/Navbar";
 import { useAuthUser } from "@/hooks/useAuthUser";
 import { ProductCard, type Product } from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
+import { BrandLogo } from "@/components/Brand";
 
 export const Route = createFileRoute("/")({
   ssr: false,
@@ -233,7 +234,9 @@ function LandingPage() {
         <footer className="border-t border-border">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid md:grid-cols-4 gap-8 text-sm">
             <div>
-              <div className="font-display font-bold text-lg text-primary">PameLuxury</div>
+              <div className="flex items-center gap-2 font-display font-bold text-lg text-primary">
+                <BrandLogo className="h-8 w-8" /> PameLuxury
+              </div>
               <p className="mt-2 text-muted-foreground">Premium women's accessories, delivered across Nigeria.</p>
             </div>
             <div>
