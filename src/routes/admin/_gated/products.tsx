@@ -28,6 +28,7 @@ type Product = {
   image_url: string;
   images: string[];
   stock: number;
+  rating: number;
   category_id: string | null;
   subcategory_id: string | null;
   brand_id: string | null;
@@ -117,7 +118,7 @@ function ProductsPage() {
         </div>
         <Button onClick={() => setEditing({
           name: "", slug: "", description: "", price: 0, stock: 0,
-          image_url: "", images: [], colors: [], sizes: [],
+          image_url: "", images: [], colors: [], sizes: [], rating: 0,
           category_id: (categories as any[])[0]?.id ?? null,
           brand_id: null, subcategory_id: null,
           best_seller: false, new_arrival: false, featured: false,
@@ -254,6 +255,7 @@ function ProductModal({
       brand_id: p.brand_id ?? null,
       colors: p.colors ?? [],
       sizes: p.sizes ?? [],
+      rating: Number(p.rating ?? 0),
       best_seller: !!p.best_seller,
       new_arrival: !!p.new_arrival,
       featured: !!p.featured,
@@ -279,6 +281,9 @@ function ProductModal({
             </Field>
             <Field label="Stock quantity">
               <Input type="number" min={0} value={p.stock ?? 0} onChange={(e) => set("stock", Number(e.target.value))} required />
+            </Field>
+            <Field label="Rating (0–5)">
+              <Input type="number" min={0} max={5} step="0.1" value={p.rating ?? 0} onChange={(e) => set("rating", Number(e.target.value))} />
             </Field>
             <div className="flex flex-col gap-2 pt-6">
               <label className="text-xs flex items-center gap-2"><input type="checkbox" checked={!!p.best_seller} onChange={(e) => set("best_seller", e.target.checked)} /> Best seller</label>
