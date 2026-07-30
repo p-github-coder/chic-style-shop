@@ -88,7 +88,7 @@ function SignupPage() {
       <div className="min-h-screen flex items-center justify-center p-6 bg-background">
         <div className="max-w-md w-full text-center bg-card border border-border rounded-3xl p-10">
           <div className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-accent text-primary mb-4">
-            <ShoppingBag className="h-8 w-8" />
+            <BrandLogo className="h-9 w-9" />
           </div>
           <h1 className="text-2xl font-display font-bold">Application submitted</h1>
           <p className="mt-3 text-muted-foreground">
