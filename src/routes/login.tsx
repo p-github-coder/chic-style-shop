@@ -46,19 +46,19 @@ function LoginPage() {
     if (profile?.status === "pending") {
       await supabase.auth.signOut();
       setLoading(false);
-      toast.error("Your application is pending admin review.");
+      toast.error("Your account is awaiting administrator approval. You'll be able to sign in once it is approved.");
       return;
     }
     if (profile?.status === "rejected") {
       await supabase.auth.signOut();
       setLoading(false);
-      toast.error("Your application was not approved.");
+      toast.error("Your account has been rejected by the administrator. Please contact support for more information.");
       return;
     }
     if (profile?.status === "suspended") {
       await supabase.auth.signOut();
       setLoading(false);
-      toast.error("Your account has been suspended. Please contact support.");
+      toast.error("Your account has been suspended by the administrator. Please contact support for assistance.");
       return;
     }
 
