@@ -18,14 +18,24 @@ export function useCartCount(enabled: boolean) {
   });
 }
 
-const CATEGORY_LINKS = [
-  { slug: "bags", label: "Bags" },
-  { slug: "jewelry", label: "Jewelry" },
-  { slug: "watches", label: "Watches" },
-  { slug: "hair-accessories", label: "Hair" },
-  { slug: "fashion-accessories", label: "Accessories" },
-  { slug: "beauty-makeup", label: "Beauty" },
-];
+/** Categories come straight from the database, so anything the admin adds
+ *  shows up in the navigation (and everywhere else) with no code change. */
+function useCategoryLinks() {
+  const { data = [] } = useQuery({
+    queryKey: ["categories", "nav"],
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("categories")
+        .select("id, slug, name")
+        .order("sort_order");
+      if (error) throw error;
+      return data as { id: string; slug: string; name: string }[];
+    },
+  });
+  return data;
+}
+
 
 export function Navbar() {
   const navigate = useNavigate();
