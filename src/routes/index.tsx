@@ -171,10 +171,13 @@ function LandingPage() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                  <h3 className="font-display font-extrabold text-2xl">{c.name}</h3>
-                  <p className="text-sm opacity-90 mt-1 line-clamp-2">{c.description}</p>
-                  <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium">
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 text-white">
+                  <h3 className="font-display font-extrabold text-lg sm:text-2xl leading-tight line-clamp-2">{c.name}</h3>
+                  <p className="hidden sm:block text-sm opacity-90 mt-1 line-clamp-2">{c.description}</p>
+                  <div className="mt-2 sm:mt-3 inline-flex items-center gap-1 text-xs sm:text-sm font-medium">
                     Shop now <ArrowRight className="h-3.5 w-3.5" />
+                  </div>
+
                   </div>
                 </div>
               </Link>
