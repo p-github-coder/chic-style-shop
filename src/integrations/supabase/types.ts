@@ -285,6 +285,7 @@ export type Database = {
           created_at: string
           description: string
           featured: boolean
+          home_sort: number
           id: string
           image_url: string
           images: string[]
@@ -309,6 +310,7 @@ export type Database = {
           created_at?: string
           description?: string
           featured?: boolean
+          home_sort?: number
           id?: string
           image_url: string
           images?: string[]
@@ -333,6 +335,7 @@ export type Database = {
           created_at?: string
           description?: string
           featured?: boolean
+          home_sort?: number
           id?: string
           image_url?: string
           images?: string[]

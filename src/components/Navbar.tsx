@@ -6,6 +6,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { BrandLockup } from "@/components/Brand";
+import { ThemeToggle } from "@/components/ThemeToggle";
+
 
 export function useCartCount(enabled: boolean) {
   return useQuery({
@@ -58,16 +60,19 @@ export function Navbar() {
 
   async function handleLogout() {
     await queryClient.cancelQueries();
-    queryClient.clear();
     await supabase.auth.signOut({ scope: "local" });
+    // Wipe every trace of the previous shopper before the next paint.
+    setSignedIn(false);
+    queryClient.clear();
+    queryClient.removeQueries();
     if (typeof window !== "undefined") {
-      // Drop any personalised state cached outside React Query.
       localStorage.removeItem("pl:recentlyViewed");
       sessionStorage.clear();
     }
     toast.success("Signed out");
     navigate({ to: "/", replace: true });
   }
+
 
   return (
     <header className="fixed top-0 inset-x-0 z-50 bg-background/85 backdrop-blur-lg border-b border-border">
@@ -102,6 +107,7 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1">
+          <ThemeToggle />
           <Link
             to="/search"
             className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
@@ -114,6 +120,7 @@ export function Navbar() {
             className="hidden sm:inline-flex h-10 w-10 items-center justify-center rounded-full hover:bg-accent"
             aria-label="Wishlist"
           >
+
             <Heart className="h-5 w-5" />
           </Link>
           <Link

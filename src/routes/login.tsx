@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/Brand";
+import authHair from "@/assets/auth-hair.jpg";
+
 
 export const Route = createFileRoute("/login")({
   ssr: false,
@@ -36,29 +38,41 @@ function LoginPage() {
       return;
     }
 
-    // Check approval status
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("status")
-      .eq("id", signIn.user.id)
-      .maybeSingle();
+    // Always re-read the *latest* account status straight from the database
+    // (never a cached value) before letting anyone through.
+    const [{ data: profile }, { data: application }] = await Promise.all([
+      supabase.from("profiles").select("status").eq("id", signIn.user.id).maybeSingle(),
+      supabase
+        .from("registration_applications")
+        .select("status, rejection_reason")
+        .eq("user_id", signIn.user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle(),
+    ]);
 
-    if (profile?.status === "pending") {
-      await supabase.auth.signOut();
+    // The stricter of the two records wins, so a suspension can never be bypassed.
+    const status =
+      profile?.status === "approved" && application?.status && application.status !== "approved"
+        ? application.status
+        : profile?.status ?? application?.status ?? "pending";
+
+    const MESSAGES: Record<string, string> = {
+      pending:
+        "Your account is awaiting administrator approval. You'll be able to sign in once it is approved.",
+      rejected:
+        "Your account application was rejected by the administrator. Please contact support for more information.",
+      suspended:
+        "Your account has been suspended by the administrator. Please contact support for assistance.",
+    };
+
+    if (status !== "approved") {
+      await supabase.auth.signOut({ scope: "local" });
       setLoading(false);
-      toast.error("Your account is awaiting administrator approval. You'll be able to sign in once it is approved.");
-      return;
-    }
-    if (profile?.status === "rejected") {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("Your account has been rejected by the administrator. Please contact support for more information.");
-      return;
-    }
-    if (profile?.status === "suspended") {
-      await supabase.auth.signOut();
-      setLoading(false);
-      toast.error("Your account has been suspended by the administrator. Please contact support for assistance.");
+      toast.error(
+        MESSAGES[status] ??
+          "Your account is not active. Please contact support for assistance.",
+      );
       return;
     }
 
@@ -67,11 +81,19 @@ function LoginPage() {
     navigate({ to: "/" });
   }
 
+
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col justify-between p-12 text-primary-foreground relative overflow-hidden"
-        style={{ background: "var(--gradient-primary)" }}>
-        <Link to="/" className="flex items-center gap-2 font-display font-bold text-2xl">
+      <div className="hidden lg:flex flex-col justify-between p-12 text-white relative overflow-hidden">
+        <img
+          src={authHair}
+          alt="Luxury pearl hair accessories on silk"
+          width={1024}
+          height={1536}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/25" />
+        <Link to="/" className="relative z-10 flex items-center gap-2 font-display font-bold text-2xl">
           <BrandLogo className="h-9 w-9" /> PameLuxury
         </Link>
         <div className="relative z-10">
@@ -82,8 +104,10 @@ function LoginPage() {
             Curated bags, jewelry and beauty from the houses she loves.
           </p>
         </div>
-        <p className="text-sm opacity-80">© {new Date().getFullYear()} PameLuxury</p>
+        <p className="relative z-10 text-sm opacity-80">© {new Date().getFullYear()} PameLuxury</p>
       </div>
+
+
 
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">

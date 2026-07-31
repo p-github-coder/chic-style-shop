@@ -8,6 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { BrandLogo } from "@/components/Brand";
+import authBag from "@/assets/auth-bag.jpg";
+
 
 export const Route = createFileRoute("/signup")({
   ssr: false,
@@ -105,12 +107,19 @@ function SignupPage() {
 
   return (
     <div className="min-h-screen grid lg:grid-cols-2">
-      <div className="hidden lg:flex flex-col justify-between p-12 text-primary-foreground relative overflow-hidden"
-        style={{ background: "var(--gradient-primary)" }}>
-        <Link to="/" className="flex items-center gap-2 font-display font-bold text-2xl">
+      <div className="hidden lg:flex flex-col justify-between p-12 text-white relative overflow-hidden">
+        <img
+          src={authBag}
+          alt="Luxury designer handbag"
+          width={1024}
+          height={1536}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/45 to-black/25" />
+        <Link to="/" className="relative z-10 flex items-center gap-2 font-display font-bold text-2xl">
           <BrandLogo className="h-9 w-9" /> PameLuxury
         </Link>
-        <div>
+        <div className="relative z-10">
           <h1 className="text-5xl font-display font-extrabold leading-tight">
             Join the<br />PameLuxury circle.
           </h1>
@@ -118,8 +127,10 @@ function SignupPage() {
             Save your favorites, track orders and get first access to new drops.
           </p>
         </div>
-        <p className="text-sm opacity-80">© {new Date().getFullYear()} PameLuxury</p>
+        <p className="relative z-10 text-sm opacity-80">© {new Date().getFullYear()} PameLuxury</p>
       </div>
+
+
 
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">

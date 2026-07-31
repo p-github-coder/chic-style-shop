@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { Star, ShoppingBag, Loader2, Heart } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "@tanstack/react-router";
@@ -23,12 +24,17 @@ export type Product = {
 export function ProductCard({ product }: { product: Product }) {
   const qc = useQueryClient();
   const navigate = useNavigate();
-
   const { data: authUser } = useAuthUser();
+
+  // Floating hearts spawned on "like" — purely visual, cleared after the animation.
+  const [bursts, setBursts] = useState<{ id: number; drift: number }[]>([]);
+  const seq = useRef(0);
+
+  const wishKey = ["wishlist-has", authUser?.id ?? "anon", product.id];
 
   const { data: wished } = useQuery({
     // keyed per user so one customer never sees another customer's saves
-    queryKey: ["wishlist-has", authUser?.id ?? "anon", product.id],
+    queryKey: wishKey,
     enabled: !!authUser?.id,
     queryFn: async () => {
       const { data } = await supabase
@@ -40,6 +46,15 @@ export function ProductCard({ product }: { product: Product }) {
       return !!data;
     },
   });
+
+  function spawnHearts() {
+    const next = Array.from({ length: 3 }, (_, i) => ({
+      id: ++seq.current,
+      drift: (i - 1) * 14 + (Math.random() * 10 - 5),
+    }));
+    setBursts((b) => [...b, ...next]);
+    setTimeout(() => setBursts((b) => b.filter((x) => !next.some((n) => n.id === x.id))), 1200);
+  }
 
   const addToCart = useMutation({
     mutationFn: async () => {
@@ -98,22 +113,31 @@ export function ProductCard({ product }: { product: Product }) {
           .insert({ product_id: product.id, user_id: u.user.id });
       }
     },
+    // Instant feedback: flip the heart before the round-trip finishes.
+    onMutate: async () => {
+      await qc.cancelQueries({ queryKey: wishKey });
+      const prev = qc.getQueryData<boolean>(wishKey);
+      qc.setQueryData(wishKey, !prev);
+      return { prev };
+    },
+    onError: (_e, _v, ctx) => {
+      if (ctx) qc.setQueryData(wishKey, ctx.prev);
+    },
     onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["wishlist-has", authUser?.id ?? "anon", product.id] });
+      qc.invalidateQueries({ queryKey: wishKey });
       qc.invalidateQueries({ queryKey: ["wishlist"] });
     },
   });
 
-  const href = product.slug ? `/product/${product.slug}` : "#";
-
   return (
-    <div className="group bg-card rounded-3xl overflow-hidden border border-border hover:shadow-[var(--shadow-elevated)] transition-all duration-300 hover:-translate-y-1">
+    <div className="group flex h-full flex-col bg-card rounded-2xl sm:rounded-3xl overflow-hidden border border-border hover:shadow-[var(--shadow-elevated)] transition-all duration-300 hover:-translate-y-1">
       <Link to="/product/$slug" params={{ slug: product.slug ?? "" }} className="block relative">
         <div className="aspect-square overflow-hidden bg-muted">
           <img
             src={product.image_url}
             alt={product.name}
             loading="lazy"
+            decoding="async"
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
           />
         </div>
@@ -121,17 +145,29 @@ export function ProductCard({ product }: { product: Product }) {
           type="button"
           onClick={(e) => {
             e.preventDefault();
+            if (!wished) spawnHearts();
             toggleWish.mutate();
           }}
-          className="absolute top-3 right-3 h-9 w-9 rounded-full bg-background/90 backdrop-blur flex items-center justify-center hover:bg-background transition-colors"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 h-9 w-9 rounded-full bg-background/90 backdrop-blur flex items-center justify-center hover:bg-background active:scale-90 transition"
           aria-label={wished ? "Remove from wishlist" : "Add to wishlist"}
         >
-          <Heart className={`h-4 w-4 ${wished ? "fill-primary text-primary" : "text-foreground"}`} />
+          <Heart
+            className={`h-4 w-4 transition-colors ${wished ? "fill-primary text-primary heart-pop" : "text-foreground"}`}
+          />
+          {bursts.map((b) => (
+            <Heart
+              key={b.id}
+              aria-hidden
+              style={{ ["--drift" as any]: `${b.drift}px` }}
+              className="heart-float pointer-events-none absolute left-1/2 top-0 h-5 w-5 fill-primary text-primary"
+            />
+          ))}
         </button>
       </Link>
-      <div className="p-5">
+
+      <div className="flex flex-1 flex-col p-3 sm:p-5">
         {product.brands?.name && (
-          <div className="text-[11px] font-medium tracking-widest uppercase text-muted-foreground mb-1">
+          <div className="text-[10px] sm:text-[11px] font-medium tracking-widest uppercase text-muted-foreground mb-1 truncate">
             {product.brands.name}
           </div>
         )}
@@ -139,19 +175,26 @@ export function ProductCard({ product }: { product: Product }) {
           <Link
             to="/product/$slug"
             params={{ slug: product.slug ?? "" }}
-            className="font-display font-semibold text-base leading-tight line-clamp-1 hover:text-primary"
+            className="min-w-0 font-display font-semibold text-sm sm:text-base leading-tight line-clamp-2 hover:text-primary"
           >
             {product.name}
           </Link>
-          <div className="flex items-center gap-1 shrink-0 text-sm">
-            <Star className="h-4 w-4 fill-primary text-primary" />
+          <div className="flex items-center gap-1 shrink-0 text-xs sm:text-sm">
+            <Star className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-primary text-primary" />
             <span className="font-medium">{product.rating}</span>
           </div>
         </div>
-        <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2 min-h-10">{product.description}</p>
-        <div className="mt-4 flex items-center justify-between gap-3">
-          <span className="font-display font-bold text-lg">{formatNaira(product.price)}</span>
-          <Button size="sm" onClick={() => addToCart.mutate()} disabled={addToCart.isPending} className="rounded-full">
+        <p className="mt-1.5 hidden sm:line-clamp-2 text-sm text-muted-foreground sm:block">
+          {product.description}
+        </p>
+        <div className="mt-3 sm:mt-4 flex flex-col gap-2 xs:flex-row sm:flex-row sm:items-center sm:justify-between">
+          <span className="font-display font-bold text-base sm:text-lg">{formatNaira(product.price)}</span>
+          <Button
+            size="sm"
+            onClick={() => addToCart.mutate()}
+            disabled={addToCart.isPending}
+            className="rounded-full w-full sm:w-auto active:scale-95 transition"
+          >
             {addToCart.isPending ? (
               <Loader2 className="h-4 w-4 animate-spin" />
             ) : (

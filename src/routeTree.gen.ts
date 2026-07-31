@@ -25,9 +25,11 @@ import { Route as CategoryCategoryBrandRouteImport } from './routes/category.$ca
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
 import { Route as AdminGatedProductsRouteImport } from './routes/admin/_gated/products'
 import { Route as AdminGatedOrdersRouteImport } from './routes/admin/_gated/orders'
+import { Route as AdminGatedNewArrivalsRouteImport } from './routes/admin/_gated/new-arrivals'
 import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
 import { Route as AdminGatedCategoriesRouteImport } from './routes/admin/_gated/categories'
 import { Route as AdminGatedBrandsRouteImport } from './routes/admin/_gated/brands'
+import { Route as AdminGatedBestSellersRouteImport } from './routes/admin/_gated/best-sellers'
 import { Route as AdminGatedApplicationsRouteImport } from './routes/admin/_gated/applications'
 import { Route as AdminGatedActivityRouteImport } from './routes/admin/_gated/activity'
 
@@ -110,6 +112,11 @@ const AdminGatedOrdersRoute = AdminGatedOrdersRouteImport.update({
   path: '/orders',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedNewArrivalsRoute = AdminGatedNewArrivalsRouteImport.update({
+  id: '/new-arrivals',
+  path: '/new-arrivals',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedDashboardRoute = AdminGatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -123,6 +130,11 @@ const AdminGatedCategoriesRoute = AdminGatedCategoriesRouteImport.update({
 const AdminGatedBrandsRoute = AdminGatedBrandsRouteImport.update({
   id: '/brands',
   path: '/brands',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedBestSellersRoute = AdminGatedBestSellersRouteImport.update({
+  id: '/best-sellers',
+  path: '/best-sellers',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
 const AdminGatedApplicationsRoute = AdminGatedApplicationsRouteImport.update({
@@ -150,9 +162,11 @@ export interface FileRoutesByFullPath {
   '/product/$slug': typeof ProductSlugRoute
   '/admin/activity': typeof AdminGatedActivityRoute
   '/admin/applications': typeof AdminGatedApplicationsRoute
+  '/admin/best-sellers': typeof AdminGatedBestSellersRoute
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
   '/admin/users': typeof AdminGatedUsersRoute
@@ -172,9 +186,11 @@ export interface FileRoutesByTo {
   '/product/$slug': typeof ProductSlugRoute
   '/admin/activity': typeof AdminGatedActivityRoute
   '/admin/applications': typeof AdminGatedApplicationsRoute
+  '/admin/best-sellers': typeof AdminGatedBestSellersRoute
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
   '/admin/users': typeof AdminGatedUsersRoute
@@ -196,9 +212,11 @@ export interface FileRoutesById {
   '/product/$slug': typeof ProductSlugRoute
   '/admin/_gated/activity': typeof AdminGatedActivityRoute
   '/admin/_gated/applications': typeof AdminGatedApplicationsRoute
+  '/admin/_gated/best-sellers': typeof AdminGatedBestSellersRoute
   '/admin/_gated/brands': typeof AdminGatedBrandsRoute
   '/admin/_gated/categories': typeof AdminGatedCategoriesRoute
   '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/_gated/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/_gated/orders': typeof AdminGatedOrdersRoute
   '/admin/_gated/products': typeof AdminGatedProductsRoute
   '/admin/_gated/users': typeof AdminGatedUsersRoute
@@ -220,9 +238,11 @@ export interface FileRouteTypes {
     | '/product/$slug'
     | '/admin/activity'
     | '/admin/applications'
+    | '/admin/best-sellers'
     | '/admin/brands'
     | '/admin/categories'
     | '/admin/dashboard'
+    | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/users'
@@ -242,9 +262,11 @@ export interface FileRouteTypes {
     | '/product/$slug'
     | '/admin/activity'
     | '/admin/applications'
+    | '/admin/best-sellers'
     | '/admin/brands'
     | '/admin/categories'
     | '/admin/dashboard'
+    | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
     | '/admin/users'
@@ -265,9 +287,11 @@ export interface FileRouteTypes {
     | '/product/$slug'
     | '/admin/_gated/activity'
     | '/admin/_gated/applications'
+    | '/admin/_gated/best-sellers'
     | '/admin/_gated/brands'
     | '/admin/_gated/categories'
     | '/admin/_gated/dashboard'
+    | '/admin/_gated/new-arrivals'
     | '/admin/_gated/orders'
     | '/admin/_gated/products'
     | '/admin/_gated/users'
@@ -401,6 +425,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedOrdersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/new-arrivals': {
+      id: '/admin/_gated/new-arrivals'
+      path: '/new-arrivals'
+      fullPath: '/admin/new-arrivals'
+      preLoaderRoute: typeof AdminGatedNewArrivalsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/dashboard': {
       id: '/admin/_gated/dashboard'
       path: '/dashboard'
@@ -420,6 +451,13 @@ declare module '@tanstack/react-router' {
       path: '/brands'
       fullPath: '/admin/brands'
       preLoaderRoute: typeof AdminGatedBrandsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/best-sellers': {
+      id: '/admin/_gated/best-sellers'
+      path: '/best-sellers'
+      fullPath: '/admin/best-sellers'
+      preLoaderRoute: typeof AdminGatedBestSellersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
     '/admin/_gated/applications': {
@@ -455,9 +493,11 @@ const AuthenticatedRouteRouteWithChildren =
 interface AdminGatedRouteRouteChildren {
   AdminGatedActivityRoute: typeof AdminGatedActivityRoute
   AdminGatedApplicationsRoute: typeof AdminGatedApplicationsRoute
+  AdminGatedBestSellersRoute: typeof AdminGatedBestSellersRoute
   AdminGatedBrandsRoute: typeof AdminGatedBrandsRoute
   AdminGatedCategoriesRoute: typeof AdminGatedCategoriesRoute
   AdminGatedDashboardRoute: typeof AdminGatedDashboardRoute
+  AdminGatedNewArrivalsRoute: typeof AdminGatedNewArrivalsRoute
   AdminGatedOrdersRoute: typeof AdminGatedOrdersRoute
   AdminGatedProductsRoute: typeof AdminGatedProductsRoute
   AdminGatedUsersRoute: typeof AdminGatedUsersRoute
@@ -466,9 +506,11 @@ interface AdminGatedRouteRouteChildren {
 const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
   AdminGatedActivityRoute: AdminGatedActivityRoute,
   AdminGatedApplicationsRoute: AdminGatedApplicationsRoute,
+  AdminGatedBestSellersRoute: AdminGatedBestSellersRoute,
   AdminGatedBrandsRoute: AdminGatedBrandsRoute,
   AdminGatedCategoriesRoute: AdminGatedCategoriesRoute,
   AdminGatedDashboardRoute: AdminGatedDashboardRoute,
+  AdminGatedNewArrivalsRoute: AdminGatedNewArrivalsRoute,
   AdminGatedOrdersRoute: AdminGatedOrdersRoute,
   AdminGatedProductsRoute: AdminGatedProductsRoute,
   AdminGatedUsersRoute: AdminGatedUsersRoute,

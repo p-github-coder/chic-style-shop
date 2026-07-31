@@ -147,9 +147,10 @@ export const getAdminMetrics = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     await ensureAdmin(context);
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const [usersRes, appsRes, productsRes, ordersRes, lowStockRes, recentOrdersRes, recentRegRes, wishRes, cartRes] =
+    const [usersRes, rolesRes, appsRes, productsRes, ordersRes, lowStockRes, recentOrdersRes, recentRegRes, wishRes, cartRes] =
       await Promise.all([
         context.supabase.from("profiles").select("id, status", { count: "exact" }),
+        context.supabase.from("user_roles").select("user_id, role"),
         context.supabase.from("registration_applications").select("status"),
         context.supabase.from("products").select("id, stock", { count: "exact" }),
         context.supabase.from("orders").select("total, status, created_at"),
@@ -165,14 +166,27 @@ export const getAdminMetrics = createServerFn({ method: "GET" })
       ]);
     const apps = (appsRes.data ?? []) as { status: string }[];
     const orders = (ordersRes.data ?? []) as { total: number; status: string; created_at: string }[];
-    const profiles = (usersRes.data ?? []) as { status: string }[];
+    const profiles = (usersRes.data ?? []) as { id: string; status: string }[];
     const products = (productsRes.data ?? []) as { stock: number }[];
     const wishRows = (wishRes.data ?? []) as { user_id: string }[];
     const cartRows = (cartRes.data ?? []) as { user_id: string; quantity: number }[];
+    // Admin accounts are staff, not customers — never count them as shoppers.
+    const adminIds = new Set(
+      ((rolesRes.data ?? []) as { user_id: string; role: string }[])
+        .filter((r) => r.role === "admin")
+        .map((r) => r.user_id),
+    );
+    const customers = profiles.filter((p) => !adminIds.has(p.id));
+    const approvedCustomers = customers.filter((p) => p.status === "approved").length;
     return {
-      totalUsers: usersRes.count ?? 0,
-      approvedCustomers: profiles.filter((p) => p.status === "approved").length,
-      suspendedCustomers: profiles.filter((p) => p.status === "suspended").length,
+      // "Total customers" means approved customer accounts only.
+      totalUsers: approvedCustomers,
+      totalAccounts: customers.length,
+      approvedCustomers,
+      pendingCustomers: customers.filter((p) => p.status === "pending").length,
+      rejectedCustomers: customers.filter((p) => p.status === "rejected").length,
+      suspendedCustomers: customers.filter((p) => p.status === "suspended").length,
+
       pending: apps.filter((a) => a.status === "pending").length,
       approved: apps.filter((a) => a.status === "approved").length,
       rejected: apps.filter((a) => a.status === "rejected").length,
@@ -361,6 +375,64 @@ export const deleteProduct = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// -------- Homepage collections (New Arrivals / Best Sellers) --------
+const collectionField = z.enum(["new_arrival", "best_seller"]);
+
+/** Toggle a product in or out of a homepage collection. */
+export const setCollectionMembership = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid(), field: collectionField, value: z.boolean() }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const patch =
+      data.field === "best_seller" ? { best_seller: data.value } : { new_arrival: data.value };
+    const { error } = await context.supabase
+      .from("products")
+      .update(patch)
+      .eq("id", data.id);
+
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Update the editable rating shown on homepage cards. */
+export const setProductRating = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ id: z.string().uuid(), rating: z.number().min(0).max(5) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { error } = await context.supabase
+      .from("products")
+      .update({ rating: data.rating })
+      .eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+/** Persist the display order of a homepage collection. */
+export const reorderCollection = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) =>
+    z.object({ ids: z.array(z.string().uuid()).max(200) }).parse(d),
+  )
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    for (let i = 0; i < data.ids.length; i++) {
+      const { error } = await context.supabase
+        .from("products")
+        .update({ home_sort: i })
+        .eq("id", data.ids[i]);
+      if (error) throw new Error(error.message);
+    }
+    return { ok: true };
+  });
+
+
 
 // -------- Categories / Subcategories / Brands --------
 const catSchema = z.object({
