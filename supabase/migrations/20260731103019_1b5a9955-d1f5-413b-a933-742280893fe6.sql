@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS home_sort integer NOT NULL DEFAULT 0;

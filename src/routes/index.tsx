@@ -63,6 +63,7 @@ function LandingPage() {
         .from("products")
         .select("id, slug, name, description, price, image_url, images, rating, brands(name, slug)")
         .eq("best_seller", true)
+        .order("home_sort")
         .order("rating", { ascending: false })
         .limit(8);
       if (error) throw error;
@@ -77,12 +78,14 @@ function LandingPage() {
         .from("products")
         .select("id, slug, name, description, price, image_url, images, rating, brands(name, slug)")
         .eq("new_arrival", true)
+        .order("home_sort")
         .order("created_at", { ascending: false })
         .limit(8);
       if (error) throw error;
       return data as unknown as Product[];
     },
   });
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -114,13 +117,14 @@ function LandingPage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs sm:text-sm backdrop-blur">
                 <Sparkles className="h-3.5 w-3.5" /> New Season · Autumn Edit
               </div>
-              <h1 className="mt-5 text-5xl sm:text-7xl font-display font-extrabold leading-[1.05]">
+              <h1 className="mt-5 text-4xl sm:text-6xl lg:text-7xl font-display font-extrabold leading-[1.08]">
                 Luxury,<br />curated for you.
               </h1>
-              <p className="mt-5 text-lg sm:text-xl opacity-90 max-w-lg">
+              <p className="mt-5 text-base sm:text-xl opacity-90 max-w-lg">
                 A collection of refined accessories, beauty essentials, and timeless pieces from brands you
                 love — thoughtfully chosen for modern living.
               </p>
+
 
             </div>
           </div>
@@ -166,13 +170,14 @@ function LandingPage() {
                   className="absolute inset-0 h-full w-full object-cover group-hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                  <h3 className="font-display font-extrabold text-2xl">{c.name}</h3>
-                  <p className="text-sm opacity-90 mt-1 line-clamp-2">{c.description}</p>
-                  <div className="mt-3 inline-flex items-center gap-1 text-sm font-medium">
+                <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5 text-white">
+                  <h3 className="font-display font-extrabold text-lg sm:text-2xl leading-tight line-clamp-2">{c.name}</h3>
+                  <p className="hidden sm:block text-sm opacity-90 mt-1 line-clamp-2">{c.description}</p>
+                  <div className="mt-2 sm:mt-3 inline-flex items-center gap-1 text-xs sm:text-sm font-medium">
                     Shop now <ArrowRight className="h-3.5 w-3.5" />
                   </div>
                 </div>
+
               </Link>
             ))}
           </div>

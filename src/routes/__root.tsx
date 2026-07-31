@@ -116,11 +116,18 @@ function RootComponent() {
   useEffect(() => {
     const { data: sub } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
+      // On sign-out every personalised cache entry must disappear at once.
+      if (event === "SIGNED_OUT") {
+        queryClient.clear();
+        queryClient.removeQueries();
+      } else {
+        queryClient.invalidateQueries();
+      }
       router.invalidate();
-      if (event !== "SIGNED_OUT") queryClient.invalidateQueries();
     });
     return () => sub.subscription.unsubscribe();
   }, [router, queryClient]);
+
 
   return (
     <QueryClientProvider client={queryClient}>

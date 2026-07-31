@@ -49,7 +49,7 @@ function OrdersPage() {
   });
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <div className="mb-6">
         <h1 className="text-3xl font-display font-extrabold">Orders</h1>
         <p className="text-muted-foreground mt-1">View orders and update their fulfilment status.</p>
