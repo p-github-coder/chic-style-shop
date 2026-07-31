@@ -66,7 +66,7 @@ function DashboardPage() {
 
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <div className="mb-8">
         <h1 className="text-3xl font-display font-extrabold">Dashboard</h1>
         <p className="text-muted-foreground mt-1">Marketplace overview at a glance.</p>

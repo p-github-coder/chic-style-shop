@@ -110,7 +110,7 @@ function ProductsPage() {
   const outCount = products.filter((p) => p.stock <= 0).length;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <div className="mb-6 flex items-center justify-between flex-wrap gap-4">
         <div>
           <h1 className="text-3xl font-display font-extrabold">Products</h1>
