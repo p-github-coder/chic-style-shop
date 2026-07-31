@@ -63,6 +63,7 @@ function LandingPage() {
         .from("products")
         .select("id, slug, name, description, price, image_url, images, rating, brands(name, slug)")
         .eq("best_seller", true)
+        .order("home_sort")
         .order("rating", { ascending: false })
         .limit(8);
       if (error) throw error;
@@ -77,12 +78,14 @@ function LandingPage() {
         .from("products")
         .select("id, slug, name, description, price, image_url, images, rating, brands(name, slug)")
         .eq("new_arrival", true)
+        .order("home_sort")
         .order("created_at", { ascending: false })
         .limit(8);
       if (error) throw error;
       return data as unknown as Product[];
     },
   });
+
 
   return (
     <div className="min-h-screen bg-background">
