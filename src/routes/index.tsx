@@ -117,13 +117,14 @@ function LandingPage() {
               <div className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs sm:text-sm backdrop-blur">
                 <Sparkles className="h-3.5 w-3.5" /> New Season · Autumn Edit
               </div>
-              <h1 className="mt-5 text-5xl sm:text-7xl font-display font-extrabold leading-[1.05]">
+              <h1 className="mt-5 text-4xl sm:text-6xl lg:text-7xl font-display font-extrabold leading-[1.08]">
                 Luxury,<br />curated for you.
               </h1>
-              <p className="mt-5 text-lg sm:text-xl opacity-90 max-w-lg">
+              <p className="mt-5 text-base sm:text-xl opacity-90 max-w-lg">
                 A collection of refined accessories, beauty essentials, and timeless pieces from brands you
                 love — thoughtfully chosen for modern living.
               </p>
+
 
             </div>
           </div>
