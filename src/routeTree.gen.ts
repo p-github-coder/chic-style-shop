@@ -28,6 +28,7 @@ import { Route as AdminGatedReviewsRouteImport } from './routes/admin/_gated/rev
 import { Route as AdminGatedProductsRouteImport } from './routes/admin/_gated/products'
 import { Route as AdminGatedOrdersRouteImport } from './routes/admin/_gated/orders'
 import { Route as AdminGatedNewArrivalsRouteImport } from './routes/admin/_gated/new-arrivals'
+import { Route as AdminGatedEnquiriesRouteImport } from './routes/admin/_gated/enquiries'
 import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
 import { Route as AdminGatedCategoriesRouteImport } from './routes/admin/_gated/categories'
 import { Route as AdminGatedBrandsRouteImport } from './routes/admin/_gated/brands'
@@ -129,6 +130,11 @@ const AdminGatedNewArrivalsRoute = AdminGatedNewArrivalsRouteImport.update({
   path: '/new-arrivals',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedEnquiriesRoute = AdminGatedEnquiriesRouteImport.update({
+  id: '/enquiries',
+  path: '/enquiries',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedDashboardRoute = AdminGatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/enquiries': typeof AdminGatedEnquiriesRoute
   '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
@@ -205,6 +212,7 @@ export interface FileRoutesByTo {
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/enquiries': typeof AdminGatedEnquiriesRoute
   '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
@@ -233,6 +241,7 @@ export interface FileRoutesById {
   '/admin/_gated/brands': typeof AdminGatedBrandsRoute
   '/admin/_gated/categories': typeof AdminGatedCategoriesRoute
   '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/_gated/enquiries': typeof AdminGatedEnquiriesRoute
   '/admin/_gated/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/_gated/orders': typeof AdminGatedOrdersRoute
   '/admin/_gated/products': typeof AdminGatedProductsRoute
@@ -261,6 +270,7 @@ export interface FileRouteTypes {
     | '/admin/brands'
     | '/admin/categories'
     | '/admin/dashboard'
+    | '/admin/enquiries'
     | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
@@ -287,6 +297,7 @@ export interface FileRouteTypes {
     | '/admin/brands'
     | '/admin/categories'
     | '/admin/dashboard'
+    | '/admin/enquiries'
     | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/admin/_gated/brands'
     | '/admin/_gated/categories'
     | '/admin/_gated/dashboard'
+    | '/admin/_gated/enquiries'
     | '/admin/_gated/new-arrivals'
     | '/admin/_gated/orders'
     | '/admin/_gated/products'
@@ -471,6 +483,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedNewArrivalsRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/enquiries': {
+      id: '/admin/_gated/enquiries'
+      path: '/enquiries'
+      fullPath: '/admin/enquiries'
+      preLoaderRoute: typeof AdminGatedEnquiriesRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/dashboard': {
       id: '/admin/_gated/dashboard'
       path: '/dashboard'
@@ -536,6 +555,7 @@ interface AdminGatedRouteRouteChildren {
   AdminGatedBrandsRoute: typeof AdminGatedBrandsRoute
   AdminGatedCategoriesRoute: typeof AdminGatedCategoriesRoute
   AdminGatedDashboardRoute: typeof AdminGatedDashboardRoute
+  AdminGatedEnquiriesRoute: typeof AdminGatedEnquiriesRoute
   AdminGatedNewArrivalsRoute: typeof AdminGatedNewArrivalsRoute
   AdminGatedOrdersRoute: typeof AdminGatedOrdersRoute
   AdminGatedProductsRoute: typeof AdminGatedProductsRoute
@@ -550,6 +570,7 @@ const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
   AdminGatedBrandsRoute: AdminGatedBrandsRoute,
   AdminGatedCategoriesRoute: AdminGatedCategoriesRoute,
   AdminGatedDashboardRoute: AdminGatedDashboardRoute,
+  AdminGatedEnquiriesRoute: AdminGatedEnquiriesRoute,
   AdminGatedNewArrivalsRoute: AdminGatedNewArrivalsRoute,
   AdminGatedOrdersRoute: AdminGatedOrdersRoute,
   AdminGatedProductsRoute: AdminGatedProductsRoute,

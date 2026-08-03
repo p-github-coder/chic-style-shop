@@ -259,9 +259,9 @@ function LandingPage() {
             <div>
               <div className="font-semibold mb-3">Help</div>
               <ul className="space-y-2 text-muted-foreground">
-                <li>Shipping & returns</li>
-                <li>Contact us</li>
-                <li>FAQs</li>
+                <li><Link to="/contact" className="hover:text-foreground">Contact us</Link></li>
+                <li><Link to="/contact" className="hover:text-foreground">Shipping & returns</Link></li>
+                <li><Link to="/contact" className="hover:text-foreground">FAQs & support</Link></li>
               </ul>
             </div>
             <div>
