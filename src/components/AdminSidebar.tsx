@@ -3,7 +3,7 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import {
   LayoutDashboard, Users, Package, Tags, ShoppingCart, UserCog,
   Ticket, Bell, Plug, Headphones, Settings, LogOut, Bookmark, Activity,
-  Sparkles, Flame, Menu, X,
+  Sparkles, Flame, Menu, X, Star, Mail,
 } from "lucide-react";
 import { supabaseAdminClient as supabase } from "@/integrations/supabase/admin-client";
 import { useQueryClient } from "@tanstack/react-query";
@@ -20,6 +20,8 @@ const nav = [
   { to: "/admin/categories", label: "Categories", icon: Tags, enabled: true },
   { to: "/admin/brands", label: "Brands", icon: Bookmark, enabled: true },
   { to: "/admin/orders", label: "Orders", icon: ShoppingCart, enabled: true },
+  { to: "/admin/reviews", label: "Reviews", icon: Star, enabled: true },
+  { to: "/admin/enquiries", label: "Enquiries", icon: Mail, enabled: true },
   { to: "/admin/activity", label: "Activity", icon: Activity, enabled: true },
   { label: "Coupons", icon: Ticket },
   { label: "Notifications", icon: Bell },

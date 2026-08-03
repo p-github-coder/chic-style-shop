@@ -13,6 +13,7 @@ import { Route as WishlistRouteImport } from './routes/wishlist'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ContactRouteImport } from './routes/contact'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProductSlugRouteImport } from './routes/product.$slug'
@@ -23,9 +24,11 @@ import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/c
 import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
 import { Route as CategoryCategoryBrandRouteImport } from './routes/category.$category.$brand'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
+import { Route as AdminGatedReviewsRouteImport } from './routes/admin/_gated/reviews'
 import { Route as AdminGatedProductsRouteImport } from './routes/admin/_gated/products'
 import { Route as AdminGatedOrdersRouteImport } from './routes/admin/_gated/orders'
 import { Route as AdminGatedNewArrivalsRouteImport } from './routes/admin/_gated/new-arrivals'
+import { Route as AdminGatedEnquiriesRouteImport } from './routes/admin/_gated/enquiries'
 import { Route as AdminGatedDashboardRouteImport } from './routes/admin/_gated/dashboard'
 import { Route as AdminGatedCategoriesRouteImport } from './routes/admin/_gated/categories'
 import { Route as AdminGatedBrandsRouteImport } from './routes/admin/_gated/brands'
@@ -51,6 +54,11 @@ const SearchRoute = SearchRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
@@ -102,6 +110,11 @@ const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedReviewsRoute = AdminGatedReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedProductsRoute = AdminGatedProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -115,6 +128,11 @@ const AdminGatedOrdersRoute = AdminGatedOrdersRouteImport.update({
 const AdminGatedNewArrivalsRoute = AdminGatedNewArrivalsRouteImport.update({
   id: '/new-arrivals',
   path: '/new-arrivals',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
+const AdminGatedEnquiriesRoute = AdminGatedEnquiriesRouteImport.update({
+  id: '/enquiries',
+  path: '/enquiries',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
 const AdminGatedDashboardRoute = AdminGatedDashboardRouteImport.update({
@@ -150,6 +168,7 @@ const AdminGatedActivityRoute = AdminGatedActivityRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
@@ -166,14 +185,17 @@ export interface FileRoutesByFullPath {
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/enquiries': typeof AdminGatedEnquiriesRoute
   '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
+  '/admin/reviews': typeof AdminGatedReviewsRoute
   '/admin/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
@@ -190,9 +212,11 @@ export interface FileRoutesByTo {
   '/admin/brands': typeof AdminGatedBrandsRoute
   '/admin/categories': typeof AdminGatedCategoriesRoute
   '/admin/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/enquiries': typeof AdminGatedEnquiriesRoute
   '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
+  '/admin/reviews': typeof AdminGatedReviewsRoute
   '/admin/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -200,6 +224,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/search': typeof SearchRoute
   '/signup': typeof SignupRoute
@@ -216,9 +241,11 @@ export interface FileRoutesById {
   '/admin/_gated/brands': typeof AdminGatedBrandsRoute
   '/admin/_gated/categories': typeof AdminGatedCategoriesRoute
   '/admin/_gated/dashboard': typeof AdminGatedDashboardRoute
+  '/admin/_gated/enquiries': typeof AdminGatedEnquiriesRoute
   '/admin/_gated/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/_gated/orders': typeof AdminGatedOrdersRoute
   '/admin/_gated/products': typeof AdminGatedProductsRoute
+  '/admin/_gated/reviews': typeof AdminGatedReviewsRoute
   '/admin/_gated/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -226,6 +253,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/contact'
     | '/login'
     | '/search'
     | '/signup'
@@ -242,14 +270,17 @@ export interface FileRouteTypes {
     | '/admin/brands'
     | '/admin/categories'
     | '/admin/dashboard'
+    | '/admin/enquiries'
     | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/reviews'
     | '/admin/users'
     | '/category/$category/$brand'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/contact'
     | '/login'
     | '/search'
     | '/signup'
@@ -266,15 +297,18 @@ export interface FileRouteTypes {
     | '/admin/brands'
     | '/admin/categories'
     | '/admin/dashboard'
+    | '/admin/enquiries'
     | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/reviews'
     | '/admin/users'
     | '/category/$category/$brand'
   id:
     | '__root__'
     | '/'
     | '/_authenticated'
+    | '/contact'
     | '/login'
     | '/search'
     | '/signup'
@@ -291,9 +325,11 @@ export interface FileRouteTypes {
     | '/admin/_gated/brands'
     | '/admin/_gated/categories'
     | '/admin/_gated/dashboard'
+    | '/admin/_gated/enquiries'
     | '/admin/_gated/new-arrivals'
     | '/admin/_gated/orders'
     | '/admin/_gated/products'
+    | '/admin/_gated/reviews'
     | '/admin/_gated/users'
     | '/category/$category/$brand'
   fileRoutesById: FileRoutesById
@@ -301,6 +337,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  ContactRoute: typeof ContactRoute
   LoginRoute: typeof LoginRoute
   SearchRoute: typeof SearchRoute
   SignupRoute: typeof SignupRoute
@@ -339,6 +376,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_authenticated': {
@@ -411,6 +455,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedUsersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/reviews': {
+      id: '/admin/_gated/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AdminGatedReviewsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/products': {
       id: '/admin/_gated/products'
       path: '/products'
@@ -430,6 +481,13 @@ declare module '@tanstack/react-router' {
       path: '/new-arrivals'
       fullPath: '/admin/new-arrivals'
       preLoaderRoute: typeof AdminGatedNewArrivalsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
+    '/admin/_gated/enquiries': {
+      id: '/admin/_gated/enquiries'
+      path: '/enquiries'
+      fullPath: '/admin/enquiries'
+      preLoaderRoute: typeof AdminGatedEnquiriesRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
     '/admin/_gated/dashboard': {
@@ -497,9 +555,11 @@ interface AdminGatedRouteRouteChildren {
   AdminGatedBrandsRoute: typeof AdminGatedBrandsRoute
   AdminGatedCategoriesRoute: typeof AdminGatedCategoriesRoute
   AdminGatedDashboardRoute: typeof AdminGatedDashboardRoute
+  AdminGatedEnquiriesRoute: typeof AdminGatedEnquiriesRoute
   AdminGatedNewArrivalsRoute: typeof AdminGatedNewArrivalsRoute
   AdminGatedOrdersRoute: typeof AdminGatedOrdersRoute
   AdminGatedProductsRoute: typeof AdminGatedProductsRoute
+  AdminGatedReviewsRoute: typeof AdminGatedReviewsRoute
   AdminGatedUsersRoute: typeof AdminGatedUsersRoute
 }
 
@@ -510,9 +570,11 @@ const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
   AdminGatedBrandsRoute: AdminGatedBrandsRoute,
   AdminGatedCategoriesRoute: AdminGatedCategoriesRoute,
   AdminGatedDashboardRoute: AdminGatedDashboardRoute,
+  AdminGatedEnquiriesRoute: AdminGatedEnquiriesRoute,
   AdminGatedNewArrivalsRoute: AdminGatedNewArrivalsRoute,
   AdminGatedOrdersRoute: AdminGatedOrdersRoute,
   AdminGatedProductsRoute: AdminGatedProductsRoute,
+  AdminGatedReviewsRoute: AdminGatedReviewsRoute,
   AdminGatedUsersRoute: AdminGatedUsersRoute,
 }
 
@@ -534,6 +596,7 @@ const CategoryCategoryRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  ContactRoute: ContactRoute,
   LoginRoute: LoginRoute,
   SearchRoute: SearchRoute,
   SignupRoute: SignupRoute,
@@ -546,13 +609,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

@@ -4,6 +4,10 @@ import { useServerFn } from "@tanstack/react-start";
 import { useState } from "react";
 import { Check, X, Loader2, Clock, CheckCircle2, XCircle, Trash2, Ban } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useRealtimeSync } from "@/hooks/useRealtimeSync";
 import {
@@ -85,9 +89,20 @@ function ApplicationsPage() {
 
   const remove = useMutation({
     mutationFn: (id: string) => deleteFn({ data: { applicationId: id } }),
+    onMutate: async (id: string) => {
+      await qc.cancelQueries({ queryKey: ["admin", "applications"] });
+      const prev = qc.getQueryData<Application[]>(["admin", "applications"]);
+      qc.setQueryData<Application[]>(["admin", "applications"], (old) => (old ?? []).filter((a) => a.id !== id));
+      return { prev };
+    },
+    onError: (e: Error, _id, ctx) => {
+      if (ctx?.prev) qc.setQueryData(["admin", "applications"], ctx.prev);
+      toast.error(e.message);
+    },
     onSuccess: () => { toast.success("Application deleted"); refresh(); },
-    onError: (e: Error) => toast.error(e.message),
   });
+
+  const [pendingDelete, setPendingDelete] = useState<Application | null>(null);
 
   const counts = (s: Status) => applications.filter((a) => a.status === s).length;
   const filtered = applications.filter((a) => filter === "all" || a.status === filter);
@@ -182,7 +197,7 @@ function ApplicationsPage() {
                         )}
                         <Button size="sm" variant="destructive" className="rounded-full"
                           disabled={remove.isPending}
-                          onClick={() => { if (confirm(`Delete application for ${app.email}?`)) remove.mutate(app.id); }}>
+                          onClick={() => setPendingDelete(app)}>
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
                       </div>
@@ -194,6 +209,26 @@ function ApplicationsPage() {
           </div>
         )}
       </div>
+
+      <AlertDialog open={!!pendingDelete} onOpenChange={(o) => !o && setPendingDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete this application?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This permanently removes the registration application for {pendingDelete?.email} from the system. This cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => { if (pendingDelete) remove.mutate(pendingDelete.id); setPendingDelete(null); }}
+            >
+              Delete permanently
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

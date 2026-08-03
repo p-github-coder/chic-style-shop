@@ -565,3 +565,100 @@ export const updateOrderStatus = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     return { ok: true };
   });
+
+// -------- Reviews moderation --------
+export const listReviews = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
+      .from("reviews")
+      .select("id, rating, title, body, author_name, status, created_at, reviewed_at, products(name, slug)")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data;
+  });
+
+export const moderateReview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { reviewId: string; status: "approved" | "rejected" | "pending" }) => {
+    if (!["approved", "rejected", "pending"].includes(d.status)) throw new Error("Invalid status");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { error } = await context.supabase
+      .from("reviews")
+      .update({ status: data.status, reviewed_by: context.userId, reviewed_at: new Date().toISOString() })
+      .eq("id", data.reviewId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteReview = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { reviewId: string }) => d)
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("reviews").delete().eq("id", data.reviewId);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// -------- Contact enquiries --------
+export const listEnquiries = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    await ensureAdmin(context);
+    const { data, error } = await context.supabase
+      .from("contact_messages")
+      .select("id, name, email, subject, message, status, created_at")
+      .order("created_at", { ascending: false });
+    if (error) throw new Error(error.message);
+    return data;
+  });
+
+export const updateEnquiryStatus = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string; status: "unread" | "read" | "responded" }) => {
+    if (!["unread", "read", "responded"].includes(d.status)) throw new Error("Invalid status");
+    return d;
+  })
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("contact_messages").update({ status: data.status }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+export const deleteEnquiry = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: { id: string }) => d)
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("contact_messages").delete().eq("id", data.id);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
+
+// -------- Business contact settings --------
+const settingsSchema = z.object({
+  support_email: z.string().trim().email().max(255),
+  phone: z.string().trim().max(60),
+  address: z.string().trim().max(300),
+  hours: z.string().trim().max(300),
+  instagram_url: z.string().trim().max(300),
+  facebook_url: z.string().trim().max(300),
+  twitter_url: z.string().trim().max(300),
+  whatsapp_url: z.string().trim().max(300),
+});
+
+export const updateSiteSettings = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator((d: unknown) => settingsSchema.parse(d))
+  .handler(async ({ data, context }) => {
+    await ensureAdmin(context);
+    const { error } = await context.supabase.from("site_settings").update(data).eq("singleton", true);
+    if (error) throw new Error(error.message);
+    return { ok: true };
+  });
