@@ -58,8 +58,25 @@ function ProductPage() {
         .from("reviews")
         .select("id, rating, title, body, author_name, created_at")
         .eq("product_id", product!.id)
+        .eq("status", "approved")
         .order("created_at", { ascending: false });
       if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: myReview } = useQuery({
+    queryKey: ["my-review", product?.id],
+    enabled: !!product?.id,
+    queryFn: async () => {
+      const { data: u } = await supabase.auth.getUser();
+      if (!u.user) return null;
+      const { data } = await supabase
+        .from("reviews")
+        .select("id, status")
+        .eq("product_id", product!.id)
+        .eq("user_id", u.user.id)
+        .maybeSingle();
       return data;
     },
   });
@@ -191,6 +208,9 @@ function ProductPage() {
           rating: rvRating,
           title: rvTitle,
           body: rvBody,
+          status: "pending" as const,
+          reviewed_by: null,
+          reviewed_at: null,
           author_name: profile?.full_name || u.user.email?.split("@")[0] || "Customer",
         },
         { onConflict: "product_id,user_id" },
@@ -198,10 +218,11 @@ function ProductPage() {
       if (error) throw error;
     },
     onSuccess: () => {
-      toast.success("Thanks for your review!");
+      toast.success("Thanks! Your review is awaiting approval.");
       setRvTitle("");
       setRvBody("");
       qc.invalidateQueries({ queryKey: ["reviews", product?.id] });
+      qc.invalidateQueries({ queryKey: ["my-review", product?.id] });
     },
     onError: (e: Error) => {
       if (e.message !== "Not signed in") toast.error(e.message);
@@ -454,6 +475,17 @@ function ProductPage() {
                 className="bg-card border border-border rounded-2xl p-6 space-y-4 h-fit"
               >
                 <div className="font-display font-bold">Write a review</div>
+                {myReview?.status === "pending" && (
+                  <div className="rounded-xl bg-amber-50 text-amber-900 text-xs px-3 py-2">
+                    Your review is pending approval and will appear once our team has reviewed it.
+                  </div>
+                )}
+                {myReview?.status === "rejected" && (
+                  <div className="rounded-xl bg-muted text-muted-foreground text-xs px-3 py-2">
+                    Your previous review was not approved. You can submit an updated one.
+                  </div>
+                )}
+                <p className="text-xs text-muted-foreground">All reviews are checked by our team before they appear publicly.</p>
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((n) => (
                     <button key={n} type="button" onClick={() => setRvRating(n)}>

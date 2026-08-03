@@ -42,6 +42,7 @@ function useCategoryLinks() {
 
 export function Navbar() {
   const navigate = useNavigate();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
@@ -71,6 +72,7 @@ export function Navbar() {
     }
     toast.success("Signed out");
     navigate({ to: "/", replace: true });
+    await router.invalidate();
   }
 
 
