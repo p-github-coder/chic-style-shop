@@ -24,6 +24,7 @@ import { Route as AuthenticatedCartRouteImport } from './routes/_authenticated/c
 import { Route as AdminGatedRouteRouteImport } from './routes/admin/_gated/route'
 import { Route as CategoryCategoryBrandRouteImport } from './routes/category.$category.$brand'
 import { Route as AdminGatedUsersRouteImport } from './routes/admin/_gated/users'
+import { Route as AdminGatedReviewsRouteImport } from './routes/admin/_gated/reviews'
 import { Route as AdminGatedProductsRouteImport } from './routes/admin/_gated/products'
 import { Route as AdminGatedOrdersRouteImport } from './routes/admin/_gated/orders'
 import { Route as AdminGatedNewArrivalsRouteImport } from './routes/admin/_gated/new-arrivals'
@@ -108,6 +109,11 @@ const AdminGatedUsersRoute = AdminGatedUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AdminGatedRouteRoute,
 } as any)
+const AdminGatedReviewsRoute = AdminGatedReviewsRouteImport.update({
+  id: '/reviews',
+  path: '/reviews',
+  getParentRoute: () => AdminGatedRouteRoute,
+} as any)
 const AdminGatedProductsRoute = AdminGatedProductsRouteImport.update({
   id: '/products',
   path: '/products',
@@ -176,6 +182,7 @@ export interface FileRoutesByFullPath {
   '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
+  '/admin/reviews': typeof AdminGatedReviewsRoute
   '/admin/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -201,6 +208,7 @@ export interface FileRoutesByTo {
   '/admin/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/orders': typeof AdminGatedOrdersRoute
   '/admin/products': typeof AdminGatedProductsRoute
+  '/admin/reviews': typeof AdminGatedReviewsRoute
   '/admin/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -228,6 +236,7 @@ export interface FileRoutesById {
   '/admin/_gated/new-arrivals': typeof AdminGatedNewArrivalsRoute
   '/admin/_gated/orders': typeof AdminGatedOrdersRoute
   '/admin/_gated/products': typeof AdminGatedProductsRoute
+  '/admin/_gated/reviews': typeof AdminGatedReviewsRoute
   '/admin/_gated/users': typeof AdminGatedUsersRoute
   '/category/$category/$brand': typeof CategoryCategoryBrandRoute
 }
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
     | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/reviews'
     | '/admin/users'
     | '/category/$category/$brand'
   fileRoutesByTo: FileRoutesByTo
@@ -280,6 +290,7 @@ export interface FileRouteTypes {
     | '/admin/new-arrivals'
     | '/admin/orders'
     | '/admin/products'
+    | '/admin/reviews'
     | '/admin/users'
     | '/category/$category/$brand'
   id:
@@ -306,6 +317,7 @@ export interface FileRouteTypes {
     | '/admin/_gated/new-arrivals'
     | '/admin/_gated/orders'
     | '/admin/_gated/products'
+    | '/admin/_gated/reviews'
     | '/admin/_gated/users'
     | '/category/$category/$brand'
   fileRoutesById: FileRoutesById
@@ -431,6 +443,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGatedUsersRouteImport
       parentRoute: typeof AdminGatedRouteRoute
     }
+    '/admin/_gated/reviews': {
+      id: '/admin/_gated/reviews'
+      path: '/reviews'
+      fullPath: '/admin/reviews'
+      preLoaderRoute: typeof AdminGatedReviewsRouteImport
+      parentRoute: typeof AdminGatedRouteRoute
+    }
     '/admin/_gated/products': {
       id: '/admin/_gated/products'
       path: '/products'
@@ -520,6 +539,7 @@ interface AdminGatedRouteRouteChildren {
   AdminGatedNewArrivalsRoute: typeof AdminGatedNewArrivalsRoute
   AdminGatedOrdersRoute: typeof AdminGatedOrdersRoute
   AdminGatedProductsRoute: typeof AdminGatedProductsRoute
+  AdminGatedReviewsRoute: typeof AdminGatedReviewsRoute
   AdminGatedUsersRoute: typeof AdminGatedUsersRoute
 }
 
@@ -533,6 +553,7 @@ const AdminGatedRouteRouteChildren: AdminGatedRouteRouteChildren = {
   AdminGatedNewArrivalsRoute: AdminGatedNewArrivalsRoute,
   AdminGatedOrdersRoute: AdminGatedOrdersRoute,
   AdminGatedProductsRoute: AdminGatedProductsRoute,
+  AdminGatedReviewsRoute: AdminGatedReviewsRoute,
   AdminGatedUsersRoute: AdminGatedUsersRoute,
 }
 
