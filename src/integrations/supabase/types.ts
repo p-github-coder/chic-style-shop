@@ -168,6 +168,39 @@ export type Database = {
         }
         Relationships: []
       }
+      contact_messages: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          message: string
+          name: string
+          status: Database["public"]["Enums"]["message_status"]
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id?: string
+          message: string
+          name: string
+          status?: Database["public"]["Enums"]["message_status"]
+          subject?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          message?: string
+          name?: string
+          status?: Database["public"]["Enums"]["message_status"]
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       order_items: {
         Row: {
           id: string
@@ -489,6 +522,9 @@ export type Database = {
           id: string
           product_id: string
           rating: number
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: Database["public"]["Enums"]["review_status"]
           title: string
           user_id: string
         }
@@ -499,6 +535,9 @@ export type Database = {
           id?: string
           product_id: string
           rating: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["review_status"]
           title?: string
           user_id: string
         }
@@ -509,6 +548,9 @@ export type Database = {
           id?: string
           product_id?: string
           rating?: number
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: Database["public"]["Enums"]["review_status"]
           title?: string
           user_id?: string
         }
@@ -521,6 +563,51 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      site_settings: {
+        Row: {
+          address: string
+          created_at: string
+          facebook_url: string
+          hours: string
+          id: string
+          instagram_url: string
+          phone: string
+          singleton: boolean
+          support_email: string
+          twitter_url: string
+          updated_at: string
+          whatsapp_url: string
+        }
+        Insert: {
+          address?: string
+          created_at?: string
+          facebook_url?: string
+          hours?: string
+          id?: string
+          instagram_url?: string
+          phone?: string
+          singleton?: boolean
+          support_email?: string
+          twitter_url?: string
+          updated_at?: string
+          whatsapp_url?: string
+        }
+        Update: {
+          address?: string
+          created_at?: string
+          facebook_url?: string
+          hours?: string
+          id?: string
+          instagram_url?: string
+          phone?: string
+          singleton?: boolean
+          support_email?: string
+          twitter_url?: string
+          updated_at?: string
+          whatsapp_url?: string
+        }
+        Relationships: []
       }
       subcategories: {
         Row: {
@@ -623,6 +710,8 @@ export type Database = {
     Enums: {
       app_role: "admin" | "customer" | "seller"
       application_status: "pending" | "approved" | "rejected" | "suspended"
+      message_status: "unread" | "read" | "responded"
+      review_status: "pending" | "approved" | "rejected"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -752,6 +841,8 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "customer", "seller"],
       application_status: ["pending", "approved", "rejected", "suspended"],
+      message_status: ["unread", "read", "responded"],
+      review_status: ["pending", "approved", "rejected"],
     },
   },
 } as const
